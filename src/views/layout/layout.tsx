@@ -18,7 +18,7 @@ const Layout: FC<LayoutProps> = ({ children, title }) => {
   const handleDrawerClose = () => setDrawerIsOpen(false);
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", width: "100vw" }}>
       <TopNav title={title} handleDrawerOpen={handleDrawerOpen} />
       <SideNav
         handleDrawerClose={handleDrawerClose}
@@ -28,6 +28,7 @@ const Layout: FC<LayoutProps> = ({ children, title }) => {
         component="main"
         sx={{
           flexGrow: 1,
+          width: "100%",
           p: 3,
           bgcolor: "background.default",
         }}

@@ -30,8 +30,7 @@ const Login: FC = () => {
 
         if (response.status === 200) {
           const body = await response.json();
-          navigate("/settings");
-          // navigate("/student-form");
+          navigate("/student-form");
           // navigate("/student-form", { state: { registrationCode } });
         } else {
           console.error("Registration code is invalid!");

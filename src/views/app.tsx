@@ -8,6 +8,7 @@ import en_US from "../../locales/en_US.json";
 
 import Login from "./login";
 import Settings from "./pages/settings";
+import StudentInfoForm from "./pages/studentInfoForm";
 
 const defaultLocale = "en";
 let initialLocale = defaultLocale;
@@ -96,7 +97,7 @@ const App: FC = () => {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/settings" element={<Settings />} />
-            {/* <Route path="/student-form" element={} /> */}
+            <Route path="/student-form" element={<StudentInfoForm />} />
             {/* <Route path="/home" element={} /> */}
             {/* <Route path="/classroom" element={} /> */}
             {/* <Route path="/chat" element={} /> */}

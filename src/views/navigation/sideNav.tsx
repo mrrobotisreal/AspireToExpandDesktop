@@ -11,7 +11,6 @@ import {
   ListItemText,
 } from "@mui/material";
 import {
-  ArrowBackTwoTone,
   AssignmentTwoTone,
   AssignmentTurnedInTwoTone,
   AssignmentLateTwoTone,
@@ -20,10 +19,12 @@ import {
   ExpandMoreTwoTone,
   GamesTwoTone,
   HomeTwoTone,
+  LogoutTwoTone,
   RocketLaunchTwoTone,
   SchoolTwoTone,
   SettingsTwoTone,
   VideocamTwoTone,
+  AccountCircleTwoTone,
 } from "@mui/icons-material";
 import { useIntl } from "react-intl";
 import { useNavigate } from "react-router-dom";
@@ -103,8 +104,19 @@ const SIDE_NAV_ITEMS: SideNavItem[] = [
   },
   {
     id: "menu_settings",
-    path: "/settings",
     icon: <SettingsTwoTone />,
+    children: [
+      {
+        id: "menu_settings_appSettings",
+        path: "/settings",
+        icon: <SettingsTwoTone />,
+      },
+      {
+        id: "menu_settings_profileSettings",
+        path: "/profile",
+        icon: <AccountCircleTwoTone />,
+      },
+    ],
   },
 ];
 
@@ -121,11 +133,12 @@ const SideNav: FC<SideNavProps> = ({
   const navigate = useNavigate();
   const [assignmentsAreOpen, setAssignmentsAreOpen] = useState(false);
   const [gamesAreOpen, setGamesAreOpen] = useState(false);
+  const [settingsAreOpen, setSettingsAreOpen] = useState(false);
 
   const handleAssignmentsClick = () =>
     setAssignmentsAreOpen(!assignmentsAreOpen);
-
   const handleGamesClick = () => setGamesAreOpen(!gamesAreOpen);
+  const handleSettingsClick = () => setSettingsAreOpen(!settingsAreOpen);
 
   return (
     <Drawer
@@ -134,9 +147,22 @@ const SideNav: FC<SideNavProps> = ({
       open={drawerIsOpen}
       onClose={handleDrawerClose}
     >
-      <Box>
-        <Text variant="h6" textAlign="center">
-          {intl.formatMessage({ id: "common_menu" })}
+      <Box
+        sx={{
+          bgcolor: "primary.main",
+          pt: 4,
+          pb: 4,
+          pl: 8,
+          pr: 8,
+        }}
+      >
+        <Text
+          variant="h6"
+          textAlign="center"
+          color="white"
+          fontFamily="Bauhaus-Heavy"
+        >
+          {intl.formatMessage({ id: "common_menuTitle" })}
         </Text>
       </Box>
       <Divider />
@@ -152,6 +178,9 @@ const SideNav: FC<SideNavProps> = ({
             } else if (item.id === "menu_games") {
               isOpen = gamesAreOpen;
               handleClick = handleGamesClick;
+            } else if (item.id === "menu_settings") {
+              isOpen = settingsAreOpen;
+              handleClick = handleSettingsClick;
             } else {
               isOpen = false;
               handleClick = () => {};
@@ -174,7 +203,10 @@ const SideNav: FC<SideNavProps> = ({
                   <List component="div" disablePadding>
                     {item.children.map((subItem) => (
                       <ListItem>
-                        <ListItemButton onClick={() => navigate(subItem.path!)}>
+                        <ListItemButton
+                          onClick={() => navigate(subItem.path!)}
+                          sx={{ pl: 4 }}
+                        >
                           <ListItemIcon>{subItem.icon}</ListItemIcon>
                           <ListItemText>
                             <Text variant="body1">
@@ -214,7 +246,7 @@ const SideNav: FC<SideNavProps> = ({
             }}
           >
             <ListItemIcon>
-              <ArrowBackTwoTone />
+              <LogoutTwoTone />
             </ListItemIcon>
             <ListItemText>
               <Text variant="body1">
