@@ -4,16 +4,33 @@ import { useLocation } from "react-router-dom";
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
   FormControl,
   FormHelperText,
   MenuItem,
   Select,
   SelectChangeEvent,
+  Slide,
   TextField,
 } from "@mui/material";
+import { TransitionProps } from "@mui/material/transitions";
 
 import Layout from "../layout/layout";
 import Text from "../text/text";
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>;
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const StudentInfoForm: FC = () => {
   const intl = useIntl();
@@ -28,6 +45,7 @@ const StudentInfoForm: FC = () => {
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  const [isConfirmInfoDialogOpen, setIsConfirmInfoDialogOpen] = useState(false);
 
   const handleSelectNativeLanguage = (event: SelectChangeEvent) =>
     setNativeLanguage(event.target.value);
@@ -101,6 +119,9 @@ const StudentInfoForm: FC = () => {
     }
   };
 
+  const handleConfirmInfoDialogOpen = () => setIsConfirmInfoDialogOpen(true);
+  const handleConfirmInfoDialogClose = () => setIsConfirmInfoDialogOpen(false);
+
   return (
     <Layout title={intl.formatMessage({ id: "studentInfoForm_title" })}>
       <Text variant="h4" fontFamily="Bauhaus-Heavy">
@@ -125,16 +146,18 @@ const StudentInfoForm: FC = () => {
         >
           <MenuItem value="uk">
             <Text variant="body1" fontFamily="Ubuntu-Regular">
-              Українська мова
+              {intl.formatMessage({ id: "common_language_uk" })}
             </Text>
           </MenuItem>
           <MenuItem value="ru">
             <Text variant="body1" fontFamily="Ubuntu-Regular">
-              Русский язык
+              {intl.formatMessage({ id: "common_language_ru" })}
             </Text>
           </MenuItem>
           <MenuItem value="de">
-            <Text variant="body1">Deutsche</Text>
+            <Text variant="body1">
+              {intl.formatMessage({ id: "common_language_de" })}
+            </Text>
           </MenuItem>
         </Select>
         <FormHelperText>
@@ -157,20 +180,24 @@ const StudentInfoForm: FC = () => {
           onChange={handleSelectPreferredLanguage}
         >
           <MenuItem value="en">
-            <Text variant="body1">English</Text>
+            <Text variant="body1">
+              {intl.formatMessage({ id: "common_language_en" })}
+            </Text>
           </MenuItem>
           <MenuItem value="uk">
             <Text variant="body1" fontFamily="Ubuntu-Regular">
-              Українська мова
+              {intl.formatMessage({ id: "common_language_uk" })}
             </Text>
           </MenuItem>
           <MenuItem value="ru">
             <Text variant="body1" fontFamily="Ubuntu-Regular">
-              Русский язык
+              {intl.formatMessage({ id: "common_language_ru" })}
             </Text>
           </MenuItem>
           <MenuItem value="de">
-            <Text variant="body1">Deutsche</Text>
+            <Text variant="body1">
+              {intl.formatMessage({ id: "common_language_de" })}
+            </Text>
           </MenuItem>
         </Select>
         <FormHelperText>
@@ -254,12 +281,101 @@ const StudentInfoForm: FC = () => {
       <br />
       <br />
       <Box display="flex" justifyContent="flex-end">
-        <Button variant="contained" color="primary">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleConfirmInfoDialogOpen}
+        >
           <Text variant="button">
             {intl.formatMessage({ id: "common_submit" })}
           </Text>
         </Button>
       </Box>
+      <Dialog
+        open={isConfirmInfoDialogOpen}
+        onClose={handleConfirmInfoDialogClose}
+        TransitionComponent={Transition}
+        keepMounted
+      >
+        <DialogTitle>
+          <Text variant="h5" fontFamily="Bauhaus-Heavy">
+            {intl.formatMessage({ id: "studentInfoForm_confirmInfoTitle" })}
+          </Text>
+          <Divider />
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <Text variant="h6" fontFamily="Bauhaus-Heavy">
+              {intl.formatMessage({ id: "common_nativeLanguage" })}:
+            </Text>
+          </DialogContentText>
+          <DialogContentText>
+            <Text variant="body1">
+              {intl.formatMessage({
+                id: `common_language_${nativeLanguage}`,
+              })}
+            </Text>
+          </DialogContentText>
+          <br />
+          <DialogContentText>
+            <Text variant="h6" fontFamily="Bauhaus-Heavy">
+              {intl.formatMessage({ id: "common_preferredLanguage" })}:
+            </Text>
+          </DialogContentText>
+          <DialogContentText>
+            <Text variant="body1">
+              {intl.formatMessage({
+                id: `common_language_${preferredLanguage}`,
+              })}
+            </Text>
+          </DialogContentText>
+          <br />
+          <DialogContentText>
+            <Text variant="h6" fontFamily="Bauhaus-Heavy">
+              {intl.formatMessage({ id: "common_firstName" })}:
+            </Text>
+          </DialogContentText>
+          <DialogContentText>
+            <Text variant="body1">{firstName}</Text>
+          </DialogContentText>
+          <br />
+          <DialogContentText>
+            <Text variant="h6" fontFamily="Bauhaus-Heavy">
+              {intl.formatMessage({ id: "common_lastName" })}:
+            </Text>
+          </DialogContentText>
+          <DialogContentText>
+            <Text variant="body1">{lastName}</Text>
+          </DialogContentText>
+          <br />
+          <DialogContentText>
+            <Text variant="h6" fontFamily="Bauhaus-Heavy">
+              {intl.formatMessage({ id: "common_emailAddress" })}:
+            </Text>
+          </DialogContentText>
+          <DialogContentText>
+            <Text variant="body1">{emailAddress}</Text>
+          </DialogContentText>
+          <br />
+          <br />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleConfirmInfoDialogClose} color="secondary">
+            <Text variant="button">
+              {intl.formatMessage({ id: "common_cancel" })}
+            </Text>
+          </Button>
+          <Button
+            onClick={handleConfirmInfoDialogClose}
+            color="primary"
+            variant="contained"
+          >
+            <Text variant="button">
+              {intl.formatMessage({ id: "common_confirm" })}
+            </Text>
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Layout>
   );
 };
