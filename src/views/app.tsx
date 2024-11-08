@@ -5,6 +5,7 @@ import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
 import { validateLocale } from "../utilities/locales";
 import en_US from "../../locales/en_US.json";
+import StudentContextProvider from "../context/studentContext";
 
 import Login from "./login";
 import Settings from "./pages/settings";
@@ -93,20 +94,22 @@ const App: FC = () => {
   return (
     <IntlProvider locale={locale} messages={messages}>
       <ThemeProvider theme={themeMode === "light" ? lightTheme : darkTheme}>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/student-form" element={<StudentInfoForm />} />
-            {/* <Route path="/home" element={} /> */}
-            {/* <Route path="/classroom" element={} /> */}
-            {/* <Route path="/chat" element={} /> */}
-            {/* <Route path="/lessons" element={} /> */}
-            {/* <Route path="/assignments" element={} /> */}
-            {/* <Route path="/games" element={} /> */}
-            {/* <Route path="/profile" element={} /> */}
-          </Routes>
-        </Router>
+        <StudentContextProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/student-form" element={<StudentInfoForm />} />
+              {/* <Route path="/home" element={} /> */}
+              {/* <Route path="/classroom" element={} /> */}
+              {/* <Route path="/chat" element={} /> */}
+              {/* <Route path="/lessons" element={} /> */}
+              {/* <Route path="/assignments" element={} /> */}
+              {/* <Route path="/games" element={} /> */}
+              {/* <Route path="/profile" element={} /> */}
+            </Routes>
+          </Router>
+        </StudentContextProvider>
       </ThemeProvider>
     </IntlProvider>
   );

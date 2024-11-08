@@ -3,12 +3,15 @@ import { Button, FormHelperText, Stack, TextField } from "@mui/material";
 import { useIntl } from "react-intl";
 import { useNavigate } from "react-router-dom";
 
+import { useStudentContext } from "../context/studentContext";
+
 import Text from "./text/text";
 
 const Login: FC = () => {
   const intl = useIntl();
   const navigate = useNavigate();
-  const [isLoginVisible, setIsLoginVisible] = useState(true); // false
+  const { info, updateInfo } = useStudentContext();
+  const [isLoginVisible, setIsLoginVisible] = useState(false);
   const [registrationCode, setRegistrationCode] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -30,8 +33,18 @@ const Login: FC = () => {
 
         if (response.status === 200) {
           const body = await response.json();
-          navigate("/student-form");
-          // navigate("/student-form", { state: { registrationCode } });
+          updateInfo({
+            firstName: body.first_name,
+            lastName: body.last_name,
+            email: body.email,
+          });
+          navigate("/student-form", {
+            state: {
+              firstName: body.first_name,
+              lastName: body.last_name,
+              email: body.email,
+            },
+          });
         } else {
           console.error("Registration code is invalid!");
         }
