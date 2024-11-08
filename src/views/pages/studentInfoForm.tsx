@@ -16,12 +16,14 @@ import {
   Select,
   SelectChangeEvent,
   Slide,
+  SnackbarCloseReason,
   TextField,
 } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
 
 import Layout from "../layout/layout";
 import Text from "../text/text";
+import Toast from "../alerts/toast";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -46,6 +48,7 @@ const StudentInfoForm: FC = () => {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   const [isConfirmInfoDialogOpen, setIsConfirmInfoDialogOpen] = useState(false);
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(true);
 
   const handleSelectNativeLanguage = (event: SelectChangeEvent) =>
     setNativeLanguage(event.target.value);
@@ -121,6 +124,17 @@ const StudentInfoForm: FC = () => {
 
   const handleConfirmInfoDialogOpen = () => setIsConfirmInfoDialogOpen(true);
   const handleConfirmInfoDialogClose = () => setIsConfirmInfoDialogOpen(false);
+
+  const handleCloseSnackbar = (
+    event?: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setIsSnackbarOpen(false);
+  };
 
   return (
     <Layout title={intl.formatMessage({ id: "studentInfoForm_title" })}>
@@ -376,6 +390,19 @@ const StudentInfoForm: FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Toast
+        message={intl.formatMessage({
+          id: "welcomeScreen_snackbarSuccessfulRegistration",
+        })}
+        alertProps={{
+          severity: "success",
+          onClose: handleCloseSnackbar,
+        }}
+        snackbarProps={{
+          open: isSnackbarOpen,
+          onClose: handleCloseSnackbar,
+        }}
+      />
     </Layout>
   );
 };

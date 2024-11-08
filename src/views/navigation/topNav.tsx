@@ -54,12 +54,7 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
         >
           {title}
         </Text>
-        <Avatar
-          alt="User Avatar"
-          src="/path/to/avatar.jpg"
-          sx={{ ml: "auto" }}
-          onClick={handleMenuOpen}
-        />
+        <Avatar sx={{ ml: "auto" }} onClick={handleMenuOpen} />
         <Menu
           anchorEl={anchorEl}
           anchorOrigin={{
