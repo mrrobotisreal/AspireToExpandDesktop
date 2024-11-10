@@ -23,6 +23,7 @@ import { TransitionProps } from "@mui/material/transitions";
 import bcrypt from "bcryptjs";
 
 import { MAIN_SERVER_URL } from "../../constants/urls";
+import CircularLoading from "../loading/circular";
 import Layout from "../layout/layout";
 import Text from "../text/text";
 import Toast from "../alerts/toast";
@@ -62,6 +63,7 @@ const StudentInfoForm: FC = () => {
   const [toastSeverity, setToastSeverity] = useState<"success" | "error">(
     "success"
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSelectNativeLanguage = (event: SelectChangeEvent) =>
     setNativeLanguage(event.target.value);
@@ -161,6 +163,7 @@ const StudentInfoForm: FC = () => {
   };
 
   const hashPasswordAndSendInfo = async () => {
+    setIsLoading(true);
     try {
       const salt = window.electronAPI.getSalt();
       const hashedPassword = bcrypt.hashSync(password, salt);
@@ -194,8 +197,10 @@ const StudentInfoForm: FC = () => {
         setIsSnackbarOpen(true);
         console.error("Error submitting student information"); // TODO: localize
       }
+      setIsLoading(false);
     } catch (error) {
       console.error(`Error hashing password: ${error}`); // TODO: localize
+      setIsLoading(false);
     }
   };
 
@@ -531,9 +536,13 @@ const StudentInfoForm: FC = () => {
             color="primary"
             variant="contained"
           >
-            <Text variant="button">
-              {intl.formatMessage({ id: "common_confirm" })}
-            </Text>
+            {isLoading ? (
+              <CircularLoading />
+            ) : (
+              <Text variant="button">
+                {intl.formatMessage({ id: "common_confirm" })}
+              </Text>
+            )}
           </Button>
         </DialogActions>
       </Dialog>

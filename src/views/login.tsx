@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { useStudentContext } from "../context/studentContext";
 import { MAIN_SERVER_URL } from "../constants/urls";
 
+import CircularLoading from "./loading/circular";
 import Text from "./text/text";
 
 const Login: FC = () => {
@@ -14,14 +15,17 @@ const Login: FC = () => {
   const navigate = useNavigate();
   const { updateInfo } = useStudentContext();
   const [isLoginVisible, setIsLoginVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [registrationCode, setRegistrationCode] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
 
   const handleRegistration = async () => {
+    setIsLoading(true);
     try {
       if (registrationCode === "") {
         console.error("Registration code is required"); // TODO: localize; add toast
+        setIsLoading(false);
         return;
       } else {
         const response = await fetch(
@@ -50,17 +54,21 @@ const Login: FC = () => {
         } else {
           console.error("Registration code is invalid!"); // TODO: localize; add toast
         }
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error registering user:", error); // TODO: localize; add toast
+      setIsLoading(false);
       throw error;
     }
   };
 
   const handleLogin = async () => {
+    setIsLoading(true);
     try {
       if (emailAddress === "" || password === "") {
         console.error("Email address and password are required"); // TODO: localize; add toast
+        setIsLoading(false);
         return;
       } else {
         const salt = window.electronAPI.getSalt();
@@ -89,9 +97,11 @@ const Login: FC = () => {
         } else {
           console.error("Invalid email address or password!"); // TODO: localize; add toast
         }
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error logging in:", error); // TODO: localize; add toast
+      setIsLoading(false);
       throw error;
     }
   };
@@ -200,13 +210,17 @@ const Login: FC = () => {
             }
           }}
         >
-          <Text variant="button">
-            {intl.formatMessage({
-              id: isLoginVisible
-                ? "common_login"
-                : "registrationCodeSubmitButton",
-            })}
-          </Text>
+          {isLoading ? (
+            <CircularLoading />
+          ) : (
+            <Text variant="button">
+              {intl.formatMessage({
+                id: isLoginVisible
+                  ? "common_login"
+                  : "registrationCodeSubmitButton",
+              })}
+            </Text>
+          )}
         </Button>
       </Stack>
     </div>
