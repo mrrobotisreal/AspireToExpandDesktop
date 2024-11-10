@@ -8,8 +8,11 @@ import React, {
 
 interface StudentInfo {
   firstName?: string;
+  preferredName?: string;
   lastName?: string;
   email?: string;
+  nativeLanguage?: string;
+  preferredLanguage?: string;
   // TODO: Add more fields
 }
 

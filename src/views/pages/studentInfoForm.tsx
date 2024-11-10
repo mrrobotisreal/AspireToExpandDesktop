@@ -164,6 +164,7 @@ const StudentInfoForm: FC = () => {
     try {
       const salt = window.electronAPI.getSalt();
       const hashedPassword = bcrypt.hashSync(password, salt);
+      const shortenedHash = hashedPassword.slice(0, 32);
       const response = await fetch("http://127.0.0.1:8888/students/create", {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
@@ -174,7 +175,7 @@ const StudentInfoForm: FC = () => {
           preferred_name: enteredPreferredName,
           last_name: enteredLastName,
           email: emailAddress,
-          password: hashedPassword,
+          password: shortenedHash,
         }),
       });
       setIsConfirmInfoDialogOpen(false);
@@ -183,6 +184,11 @@ const StudentInfoForm: FC = () => {
         console.log("Student information submitted successfully");
         setToastMessage("Student information submitted successfully!");
         setIsSnackbarOpen(true);
+        setEnteredFirstName("");
+        setEnteredPreferredName("");
+        setEnteredLastName("");
+        setEmailAddress("");
+        setPassword("");
       } else {
         setToastSeverity("error");
         setToastMessage("Error submitting student information");

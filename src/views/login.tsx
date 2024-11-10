@@ -2,6 +2,7 @@ import React, { FC, useState } from "react";
 import { Button, FormHelperText, Stack, TextField } from "@mui/material";
 import { useIntl } from "react-intl";
 import { useNavigate } from "react-router-dom";
+import bcrypt from "bcryptjs";
 
 import { useStudentContext } from "../context/studentContext";
 
@@ -55,7 +56,45 @@ const Login: FC = () => {
     }
   };
 
-  const handleLogin = async () => {};
+  const handleLogin = async () => {
+    try {
+      if (emailAddress === "" || password === "") {
+        console.error("Email address and password are required");
+        return;
+      } else {
+        const salt = window.electronAPI.getSalt();
+        const hashedPassword = bcrypt.hashSync(password, salt);
+        const shortenedHash = hashedPassword.slice(0, 32);
+        const response = await fetch("http://127.0.0.1:8888/validate/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json; charset=UTF-8" },
+          body: JSON.stringify({
+            email: emailAddress,
+            password: shortenedHash,
+          }),
+        });
+
+        if (response.status === 200) {
+          const body = await response.json();
+          console.log("Login successful:", body);
+          updateInfo({
+            firstName: body.first_name,
+            preferredName: body.preferred_name,
+            lastName: body.last_name,
+            email: body.email,
+            nativeLanguage: body.native_language,
+            preferredLanguage: body.preferred_language,
+          });
+          navigate("/settings");
+        } else {
+          console.error("Invalid email address or password!");
+        }
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      throw error;
+    }
+  };
 
   return (
     <div className="login-container">
