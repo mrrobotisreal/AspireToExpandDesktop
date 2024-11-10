@@ -15,8 +15,10 @@ const defaultLocale = "en";
 let initialLocale = defaultLocale;
 
 async function getLocale(): Promise<string> {
-  const locale = await window.electron.getLocale();
+  console.log("Getting locale...");
+  const locale = await window.electronAPI.getLocale();
   initialLocale = locale;
+  console.log(`Initial locale: ${initialLocale}`);
 
   return locale;
 }

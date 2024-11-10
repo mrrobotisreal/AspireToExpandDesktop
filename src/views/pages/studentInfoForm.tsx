@@ -20,6 +20,7 @@ import {
   TextField,
 } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
+import bcrypt from "bcryptjs";
 
 import Layout from "../layout/layout";
 import Text from "../text/text";
@@ -40,6 +41,9 @@ const StudentInfoForm: FC = () => {
   const { firstName, lastName, email } = state;
   const [nativeLanguage, setNativeLanguage] = useState("uk");
   const [preferredLanguage, setPreferredLanguage] = useState("en");
+  const [enteredFirstName, setEnteredFirstName] = useState(firstName);
+  const [enteredPreferredName, setEnteredPreferredName] = useState(firstName);
+  const [enteredLastName, setEnteredLastName] = useState(lastName);
   const [emailAddress, setEmailAddress] = useState(email);
   const [isEmailAddressValid, setIsEmailAddressValid] = useState(true);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -49,11 +53,26 @@ const StudentInfoForm: FC = () => {
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   const [isConfirmInfoDialogOpen, setIsConfirmInfoDialogOpen] = useState(false);
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(true);
+  const [toastMessage, setToastMessage] = useState(
+    intl.formatMessage({
+      id: "welcomeScreen_snackbarSuccessfulRegistration",
+    })
+  );
+  const [toastSeverity, setToastSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
   const handleSelectNativeLanguage = (event: SelectChangeEvent) =>
     setNativeLanguage(event.target.value);
   const handleSelectPreferredLanguage = (event: SelectChangeEvent) =>
     setPreferredLanguage(event.target.value);
+
+  const handleFirstName = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setEnteredFirstName(event.target.value);
+  const handlePreferredName = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setEnteredPreferredName(event.target.value);
+  const handleLastName = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setEnteredLastName(event.target.value);
 
   const handleEmailAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmailAddress(event.target.value);
@@ -134,6 +153,45 @@ const StudentInfoForm: FC = () => {
     }
 
     setIsSnackbarOpen(false);
+  };
+
+  const handleSubmitInfo = () => {
+    console.log("about to hash password...");
+    hashPasswordAndSendInfo();
+  };
+
+  const hashPasswordAndSendInfo = async () => {
+    try {
+      const salt = window.electronAPI.getSalt();
+      const hashedPassword = bcrypt.hashSync(password, salt);
+      const response = await fetch("http://127.0.0.1:8888/students/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=UTF-8" },
+        body: JSON.stringify({
+          native_language: nativeLanguage,
+          preferred_language: preferredLanguage,
+          first_name: enteredFirstName,
+          preferred_name: enteredPreferredName,
+          last_name: enteredLastName,
+          email: emailAddress,
+          password: hashedPassword,
+        }),
+      });
+      setIsConfirmInfoDialogOpen(false);
+
+      if (response.status === 201 || response.status === 200) {
+        console.log("Student information submitted successfully");
+        setToastMessage("Student information submitted successfully!");
+        setIsSnackbarOpen(true);
+      } else {
+        setToastSeverity("error");
+        setToastMessage("Error submitting student information");
+        setIsSnackbarOpen(true);
+        console.error("Error submitting student information");
+      }
+    } catch (error) {
+      console.error(`Error hashing password: ${error}`);
+    }
   };
 
   return (
@@ -225,6 +283,70 @@ const StudentInfoForm: FC = () => {
       <br />
       <br />
       <Text variant="h6" fontFamily="Bauhaus-Heavy">
+        {intl.formatMessage({ id: "studentInfoForm_inputFirstName" })}:
+      </Text>
+      <FormControl sx={{ minWidth: 375 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          label={
+            <Text variant="body1">
+              {intl.formatMessage({ id: "common_firstName" })}
+            </Text>
+          }
+          type="text"
+          value={enteredFirstName}
+          onChange={handleFirstName}
+        />
+      </FormControl>
+      <br />
+      <br />
+      <Text variant="h6" fontFamily="Bauhaus-Heavy">
+        {intl.formatMessage({ id: "studentInfoForm_inputPreferredName" })}:
+      </Text>
+      <FormControl sx={{ minWidth: 375 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          label={
+            <Text variant="body1">
+              {intl.formatMessage({ id: "common_preferredName" })}
+            </Text>
+          }
+          type="text"
+          value={enteredPreferredName}
+          onChange={handlePreferredName}
+          helperText={
+            <Text variant="caption">
+              {intl.formatMessage({
+                id: "studentInfoForm_inputPreferredNameHelperText",
+              })}
+            </Text>
+          }
+        />
+      </FormControl>
+      <br />
+      <br />
+      <Text variant="h6" fontFamily="Bauhaus-Heavy">
+        {intl.formatMessage({ id: "studentInfoForm_inputLastName" })}:
+      </Text>
+      <FormControl sx={{ minWidth: 375 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          label={
+            <Text variant="body1">
+              {intl.formatMessage({ id: "common_lastName" })}
+            </Text>
+          }
+          type="text"
+          value={enteredLastName}
+          onChange={handleLastName}
+        />
+      </FormControl>
+      <br />
+      <br />
+      <Text variant="h6" fontFamily="Bauhaus-Heavy">
         {intl.formatMessage({ id: "studentInfoForm_emailInputLabel" })}:
       </Text>
       <FormControl sx={{ minWidth: 375 }}>
@@ -299,6 +421,17 @@ const StudentInfoForm: FC = () => {
           variant="contained"
           color="primary"
           onClick={handleConfirmInfoDialogOpen}
+          disabled={
+            !nativeLanguage ||
+            !preferredLanguage ||
+            !enteredFirstName ||
+            !enteredPreferredName ||
+            !enteredLastName ||
+            !isEmailAddressValid ||
+            !emailAddress ||
+            !isPasswordValid ||
+            !password
+          }
         >
           <Text variant="button">
             {intl.formatMessage({ id: "common_submit" })}
@@ -350,7 +483,16 @@ const StudentInfoForm: FC = () => {
             </Text>
           </DialogContentText>
           <DialogContentText>
-            <Text variant="body1">{firstName}</Text>
+            <Text variant="body1">{enteredFirstName}</Text>
+          </DialogContentText>
+          <br />
+          <DialogContentText>
+            <Text variant="h6" fontFamily="Bauhaus-Heavy">
+              {intl.formatMessage({ id: "common_preferredName" })}:
+            </Text>
+          </DialogContentText>
+          <DialogContentText>
+            <Text variant="body1">{enteredPreferredName}</Text>
           </DialogContentText>
           <br />
           <DialogContentText>
@@ -359,7 +501,7 @@ const StudentInfoForm: FC = () => {
             </Text>
           </DialogContentText>
           <DialogContentText>
-            <Text variant="body1">{lastName}</Text>
+            <Text variant="body1">{enteredLastName}</Text>
           </DialogContentText>
           <br />
           <DialogContentText>
@@ -380,7 +522,7 @@ const StudentInfoForm: FC = () => {
             </Text>
           </Button>
           <Button
-            onClick={handleConfirmInfoDialogClose}
+            onClick={() => handleSubmitInfo()}
             color="primary"
             variant="contained"
           >
@@ -391,11 +533,9 @@ const StudentInfoForm: FC = () => {
         </DialogActions>
       </Dialog>
       <Toast
-        message={intl.formatMessage({
-          id: "welcomeScreen_snackbarSuccessfulRegistration",
-        })}
+        message={toastMessage}
         alertProps={{
-          severity: "success",
+          severity: toastSeverity,
           onClose: handleCloseSnackbar,
         }}
         snackbarProps={{

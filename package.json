@@ -34,6 +34,7 @@
   "description": "An educational desktop application for learning the English language.",
   "devDependencies": {
     "@electron/packager": "^18.3.5",
+    "@types/bcryptjs": "^2.4.6",
     "@types/electron": "^1.4.38",
     "@types/node": "^22.9.0",
     "@types/react": "^18.3.12",
@@ -59,7 +60,8 @@
     "@fontsource/roboto": "^5.1.0",
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-intl": "^6.8.7",

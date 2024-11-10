@@ -1,10 +1,8 @@
 import React, { FC, useState } from "react";
-import { Box, Container, Toolbar } from "@mui/material";
+import { Box, Container, CssBaseline, Toolbar } from "@mui/material";
 
 import TopNav from "../navigation/topNav";
 import SideNav from "../navigation/sideNav";
-
-// const drawerWidth = 240;
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,7 +16,15 @@ const Layout: FC<LayoutProps> = ({ children, title }) => {
   const handleDrawerClose = () => setDrawerIsOpen(false);
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", width: "100vw" }}>
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        width: "100vw",
+        position: "relative",
+      }}
+    >
+      <CssBaseline />
       <TopNav title={title} handleDrawerOpen={handleDrawerOpen} />
       <SideNav
         handleDrawerClose={handleDrawerClose}
@@ -29,12 +35,20 @@ const Layout: FC<LayoutProps> = ({ children, title }) => {
         sx={{
           flexGrow: 1,
           width: "100%",
-          p: 3,
+          paddingTop: "64px",
           bgcolor: "background.default",
+          position: "relative",
         }}
       >
-        <Toolbar />
-        <Container>{children}</Container>
+        <Box
+          sx={{
+            overflowY: "auto",
+            height: "calc(100vh - 64px)",
+            padding: 3,
+          }}
+        >
+          <Container>{children}</Container>
+        </Box>
       </Box>
     </Box>
   );

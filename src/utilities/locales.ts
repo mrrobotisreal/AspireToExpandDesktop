@@ -1,10 +1,13 @@
 export const VALID_LOCALES = [
-  'en',
-  'en_US',
-  'ru',
-  'ru_RU',
-  'uk',
-  'uk_UA',
+  "en",
+  "en-US",
+  "en_US",
+  "ru",
+  "ru-RU",
+  "ru_RU",
+  "uk",
+  "uk-UA",
+  "uk_UA",
 ];
 
 export function validateLocale(locale: string): boolean {
