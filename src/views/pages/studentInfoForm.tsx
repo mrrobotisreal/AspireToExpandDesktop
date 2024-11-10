@@ -22,6 +22,7 @@ import {
 import { TransitionProps } from "@mui/material/transitions";
 import bcrypt from "bcryptjs";
 
+import { MAIN_SERVER_URL } from "../../constants/urls";
 import Layout from "../layout/layout";
 import Text from "../text/text";
 import Toast from "../alerts/toast";
@@ -156,7 +157,6 @@ const StudentInfoForm: FC = () => {
   };
 
   const handleSubmitInfo = () => {
-    console.log("about to hash password...");
     hashPasswordAndSendInfo();
   };
 
@@ -165,7 +165,7 @@ const StudentInfoForm: FC = () => {
       const salt = window.electronAPI.getSalt();
       const hashedPassword = bcrypt.hashSync(password, salt);
       const shortenedHash = hashedPassword.slice(0, 32);
-      const response = await fetch("http://127.0.0.1:8888/students/create", {
+      const response = await fetch(`${MAIN_SERVER_URL}/students/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify({
@@ -174,15 +174,14 @@ const StudentInfoForm: FC = () => {
           first_name: enteredFirstName,
           preferred_name: enteredPreferredName,
           last_name: enteredLastName,
-          email: emailAddress,
+          email_address: emailAddress,
           password: shortenedHash,
         }),
       });
       setIsConfirmInfoDialogOpen(false);
 
       if (response.status === 201 || response.status === 200) {
-        console.log("Student information submitted successfully");
-        setToastMessage("Student information submitted successfully!");
+        setToastMessage("Student information submitted successfully!"); // TODO: localize
         setIsSnackbarOpen(true);
         setEnteredFirstName("");
         setEnteredPreferredName("");
@@ -191,12 +190,12 @@ const StudentInfoForm: FC = () => {
         setPassword("");
       } else {
         setToastSeverity("error");
-        setToastMessage("Error submitting student information");
+        setToastMessage("Error submitting student information"); // TODO: localize
         setIsSnackbarOpen(true);
-        console.error("Error submitting student information");
+        console.error("Error submitting student information"); // TODO: localize
       }
     } catch (error) {
-      console.error(`Error hashing password: ${error}`);
+      console.error(`Error hashing password: ${error}`); // TODO: localize
     }
   };
 

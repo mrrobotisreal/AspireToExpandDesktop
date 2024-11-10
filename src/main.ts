@@ -22,8 +22,6 @@ function createWindow(): void {
     mainWindow.loadFile(path.join(__dirname, "../index.html"));
   }
 
-  console.log(`Loaded SALT: ${process.env.SALT}`);
-
   ipcMain.handle("get-locale", () => app.getLocale());
 }
 

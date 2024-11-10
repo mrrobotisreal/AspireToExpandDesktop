@@ -5,13 +5,14 @@ import { useNavigate } from "react-router-dom";
 import bcrypt from "bcryptjs";
 
 import { useStudentContext } from "../context/studentContext";
+import { MAIN_SERVER_URL } from "../constants/urls";
 
 import Text from "./text/text";
 
 const Login: FC = () => {
   const intl = useIntl();
   const navigate = useNavigate();
-  const { info, updateInfo } = useStudentContext();
+  const { updateInfo } = useStudentContext();
   const [isLoginVisible, setIsLoginVisible] = useState(false);
   const [registrationCode, setRegistrationCode] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
@@ -20,11 +21,11 @@ const Login: FC = () => {
   const handleRegistration = async () => {
     try {
       if (registrationCode === "") {
-        console.error("Registration code is required");
+        console.error("Registration code is required"); // TODO: localize; add toast
         return;
       } else {
         const response = await fetch(
-          "http://127.0.0.1:8888/validate/registration",
+          `${MAIN_SERVER_URL}/validate/registration`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json; charset=UTF-8" },
@@ -37,21 +38,21 @@ const Login: FC = () => {
           updateInfo({
             firstName: body.first_name,
             lastName: body.last_name,
-            email: body.email,
+            emailAddress: body.email,
           });
           navigate("/student-form", {
             state: {
               firstName: body.first_name,
               lastName: body.last_name,
-              email: body.email,
+              email: body.email_address,
             },
           });
         } else {
-          console.error("Registration code is invalid!");
+          console.error("Registration code is invalid!"); // TODO: localize; add toast
         }
       }
     } catch (error) {
-      console.error("Error registering user:", error);
+      console.error("Error registering user:", error); // TODO: localize; add toast
       throw error;
     }
   };
@@ -59,13 +60,13 @@ const Login: FC = () => {
   const handleLogin = async () => {
     try {
       if (emailAddress === "" || password === "") {
-        console.error("Email address and password are required");
+        console.error("Email address and password are required"); // TODO: localize; add toast
         return;
       } else {
         const salt = window.electronAPI.getSalt();
         const hashedPassword = bcrypt.hashSync(password, salt);
         const shortenedHash = hashedPassword.slice(0, 32);
-        const response = await fetch("http://127.0.0.1:8888/validate/login", {
+        const response = await fetch(`${MAIN_SERVER_URL}/validate/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json; charset=UTF-8" },
           body: JSON.stringify({
@@ -76,22 +77,21 @@ const Login: FC = () => {
 
         if (response.status === 200) {
           const body = await response.json();
-          console.log("Login successful:", body);
           updateInfo({
             firstName: body.first_name,
             preferredName: body.preferred_name,
             lastName: body.last_name,
-            email: body.email,
+            emailAddress: body.email_address,
             nativeLanguage: body.native_language,
             preferredLanguage: body.preferred_language,
           });
           navigate("/settings");
         } else {
-          console.error("Invalid email address or password!");
+          console.error("Invalid email address or password!"); // TODO: localize; add toast
         }
       }
     } catch (error) {
-      console.error("Error logging in:", error);
+      console.error("Error logging in:", error); // TODO: localize; add toast
       throw error;
     }
   };
