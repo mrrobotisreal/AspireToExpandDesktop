@@ -11,7 +11,6 @@ import {
 import { useIntl } from "react-intl";
 
 import { AppFontStyle } from "../../constants/fonts";
-import { AppThemeMode } from "../../constants/theme";
 import { useThemeContext, ThemeMode } from "../../context/themeContext";
 import { useStudentContext } from "../../context/studentContext";
 import Layout from "../layout/layout";
@@ -21,9 +20,9 @@ import Toast from "../alerts/toast";
 const Settings: FC = () => {
   const intl = useIntl();
   const { themeMode, toggleThemeMode } = useThemeContext();
-  const { info, updateInfo } = useStudentContext();
-  const [selectedThemeMode, setSelectedThemeMode] = useState<AppThemeMode>(
-    info.themeMode ?? "system"
+  const { info, updateInfo, updateInfoOnServer } = useStudentContext();
+  const [selectedThemeMode, setSelectedThemeMode] = useState<ThemeMode>(
+    info.themeMode ?? "light"
   );
   const [selectedFontFamily, setSelectedFontFamily] = useState<AppFontStyle>(
     info.fontStyle ?? "Bauhaus"
@@ -37,7 +36,7 @@ const Settings: FC = () => {
   );
 
   const handleSelectThemeMode = (event: SelectChangeEvent) => {
-    const value = event.target.value === "system" ? "light" : "dark"; // TODO: handle checking system for mode later
+    const value = event.target.value as ThemeMode; // TODO: handle checking system for mode later
     toggleThemeMode(value);
     setSelectedThemeMode(value);
   };
@@ -45,12 +44,30 @@ const Settings: FC = () => {
   const handleSelectFontStyle = (event: SelectChangeEvent) =>
     setSelectedFontFamily(event.target.value as AppFontStyle);
 
+  const handleUpdateSettingsOnServer = async () => {
+    if (!info.emailAddress || info.emailAddress === "") {
+      console.error("Email address is required to update settings on server");
+      return;
+    }
+
+    try {
+      await updateInfoOnServer({
+        email_address: info.emailAddress,
+        theme_mode: selectedThemeMode,
+        font_style: selectedFontFamily,
+      });
+    } catch (error) {
+      console.error("Error updating settings on server: ", error);
+    }
+  };
+
   const handleUpdateSettings = () => {
     updateInfo({
       ...info,
       themeMode: selectedThemeMode,
       fontStyle: selectedFontFamily,
     });
+    handleUpdateSettingsOnServer();
     setToastIsOpen(true);
   };
 
@@ -84,13 +101,6 @@ const Settings: FC = () => {
           value={selectedThemeMode}
           onChange={handleSelectThemeMode}
         >
-          <MenuItem value="system">
-            <Text variant="body1">
-              {intl.formatMessage({
-                id: "account_appSettings_themeMode_systemTheme",
-              })}
-            </Text>
-          </MenuItem>
           <MenuItem value="light">
             <Text variant="body1">
               {intl.formatMessage({

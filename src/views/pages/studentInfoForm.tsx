@@ -168,6 +168,7 @@ const StudentInfoForm: FC = () => {
       const salt = window.electronAPI.getSalt();
       const hashedPassword = bcrypt.hashSync(password, salt);
       const shortenedHash = hashedPassword.slice(0, 32);
+      console.log("(StudentInfoForm) Hashed password: ", shortenedHash);
       const response = await fetch(`${MAIN_SERVER_URL}/students/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },

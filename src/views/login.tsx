@@ -1,9 +1,10 @@
 import React, { FC, useState } from "react";
-import { Button, FormHelperText, Stack, TextField } from "@mui/material";
+import { Button, FormHelperText, Paper, Stack, TextField } from "@mui/material";
 import { useIntl } from "react-intl";
 import { useNavigate } from "react-router-dom";
 import bcrypt from "bcryptjs";
 
+import { useThemeContext } from "../context/themeContext";
 import { useStudentContext } from "../context/studentContext";
 import { MAIN_SERVER_URL } from "../constants/urls";
 
@@ -13,6 +14,7 @@ import Text from "./text/text";
 const Login: FC = () => {
   const intl = useIntl();
   const navigate = useNavigate();
+  const { toggleThemeMode } = useThemeContext();
   const { updateInfo } = useStudentContext();
   const [isLoginVisible, setIsLoginVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,8 +44,8 @@ const Login: FC = () => {
           updateInfo({
             firstName: body.first_name,
             lastName: body.last_name,
-            emailAddress: body.email,
-            themeMode: "system",
+            emailAddress: body.email_address,
+            themeMode: "light",
             fontStyle: "Bauhaus",
           });
           navigate("/student-form", {
@@ -80,13 +82,14 @@ const Login: FC = () => {
           method: "POST",
           headers: { "Content-Type": "application/json; charset=UTF-8" },
           body: JSON.stringify({
-            email: emailAddress,
+            email_address: emailAddress,
             password: shortenedHash,
           }),
         });
 
         if (response.status === 200) {
           const body = await response.json();
+
           updateInfo({
             firstName: body.first_name,
             preferredName: body.preferred_name,
@@ -99,6 +102,11 @@ const Login: FC = () => {
             profilePicturePath: body.profile_picture_path,
             timeZone: body.time_zone,
           });
+          toggleThemeMode(
+            !body.theme_mode || body.theme_mode === ""
+              ? "light"
+              : body.theme_mode
+          );
           navigate("/settings");
         } else {
           console.error("Invalid email address or password!"); // TODO: localize; add toast
@@ -113,7 +121,14 @@ const Login: FC = () => {
   };
 
   return (
-    <div className="login-container">
+    <Paper
+      sx={{
+        p: 4,
+        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+        borderRadius: "12px",
+        minWidth: 400,
+      }}
+    >
       <Text variant="subtitle1" textAlign="center">
         {intl.formatMessage({
           id: isLoginVisible
@@ -121,7 +136,7 @@ const Login: FC = () => {
             : "welcomeScreen_welcomeTitle",
         })}
       </Text>
-      <Text variant="h1" fontFamily="Bauhaus-Heavy" textAlign="center">
+      <Text variant="h4" fontFamily="Bauhaus-Heavy" textAlign="center">
         {intl.formatMessage({ id: "appTitle" })}!
       </Text>
       <br />
@@ -229,7 +244,7 @@ const Login: FC = () => {
           )}
         </Button>
       </Stack>
-    </div>
+    </Paper>
   );
 };
 

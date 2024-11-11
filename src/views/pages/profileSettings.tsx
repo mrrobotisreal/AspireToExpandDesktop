@@ -18,7 +18,7 @@ import Toast from "../alerts/toast";
 
 const ProfileSettings: FC = () => {
   const intl = useIntl();
-  const { info, updateInfo } = useStudentContext();
+  const { info, updateInfo, updateInfoOnServer } = useStudentContext();
   const [profilePicturePath, setProfilePicturePath] = useState(
     info.profilePicturePath ?? ""
   );
@@ -49,6 +49,24 @@ const ProfileSettings: FC = () => {
   const handlePreferredLanguage = (event: SelectChangeEvent) =>
     setPreferredLanguage(event.target.value as string);
 
+  const handleUpdateSettingsOnServer = async () => {
+    if (!info.emailAddress || info.emailAddress === "") {
+      console.error("Email address is required to update settings on server");
+      return;
+    }
+
+    try {
+      await updateInfoOnServer({
+        email_address: info.emailAddress,
+        preferred_language: preferredLanguage,
+        profile_picture_path: profilePicturePath,
+        time_zone: timeZone,
+      });
+    } catch (error) {
+      console.error("Error updating settings on server: ", error);
+    }
+  };
+
   const handleUpdateSettings = () => {
     updateInfo({
       ...info,
@@ -56,6 +74,7 @@ const ProfileSettings: FC = () => {
       profilePicturePath,
       timeZone,
     });
+    handleUpdateSettingsOnServer();
     setToastIsOpen(true);
   };
 
