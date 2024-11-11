@@ -9,6 +9,7 @@ import StudentContextProvider from "../context/studentContext";
 import { useThemeContext } from "../context/themeContext";
 
 import Login from "./login";
+import Home from "./pages/home";
 import ProfileSettings from "./pages/profileSettings";
 import Settings from "./pages/settings";
 import StudentInfoForm from "./pages/studentInfoForm";
@@ -100,7 +101,7 @@ const App: FC = () => {
               <Route path="/settings" element={<Settings />} />
               <Route path="/profile" element={<ProfileSettings />} />
               <Route path="/student-form" element={<StudentInfoForm />} />
-              {/* <Route path="/home" element={} /> */}
+              <Route path="/home" element={<Home />} />
               {/* <Route path="/classroom" element={} /> */}
               {/* <Route path="/chat" element={} /> */}
               {/* <Route path="/lessons" element={} /> */}

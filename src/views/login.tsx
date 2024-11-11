@@ -107,7 +107,7 @@ const Login: FC = () => {
               ? "light"
               : body.theme_mode
           );
-          navigate("/settings");
+          navigate("/home");
         } else {
           console.error("Invalid email address or password!"); // TODO: localize; add toast
         }

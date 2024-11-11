@@ -210,10 +210,7 @@ const StudentInfoForm: FC = () => {
   return (
     <Layout title={intl.formatMessage({ id: "studentInfoForm_title" })}>
       <Text variant="h4" fontFamily="Bauhaus-Heavy">
-        {intl.formatMessage(
-          { id: "studentInfoForm_welcomeStudent" },
-          { firstName }
-        )}
+        {intl.formatMessage({ id: "common_welcome" }, { firstName })}
       </Text>
       <Text variant="body1">
         {intl.formatMessage({ id: "studentInfoForm_description" })}
