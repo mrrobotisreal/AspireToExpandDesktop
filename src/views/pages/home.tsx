@@ -15,6 +15,9 @@ const Home: FC = () => {
       <Text variant="h4" fontFamily="Bauhaus-Heavy">
         {intl.formatMessage({ id: "common_welcome" }, { firstName })}
       </Text>
+      <Text variant="body1">
+        {intl.formatMessage({ id: "home_description" })}
+      </Text>
     </Layout>
   );
 };

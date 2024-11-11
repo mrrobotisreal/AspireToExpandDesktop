@@ -46,6 +46,7 @@
   "common_submit": "Submit",
   "common_timeZone": "Time zone",
   "common_welcome": "Welcome, {firstName}!",
+  "home_description": "Have a look at the dashboard below for a quick overview of your progress, upcoming assignments, and scheduled classes.",
   "menu_assignments": "Assignments",
   "menu_assignments_allAssignments": "All assignments",
   "menu_assignments_completedAssignments": "Completed assignments",
