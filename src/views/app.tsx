@@ -6,6 +6,7 @@ import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { validateLocale } from "../utilities/locales";
 import en_US from "../../locales/en_US.json";
 import StudentContextProvider from "../context/studentContext";
+import { useThemeContext } from "../context/themeContext";
 
 import Login from "./login";
 import ProfileSettings from "./pages/profileSettings";
@@ -28,28 +29,23 @@ getLocale();
 const lightTheme = createTheme({
   palette: {
     mode: "light",
-    primary: { main: "#007bff" },
-    secondary: { main: "#f44336" },
+    primary: { main: "#007bff", light: "#8dd0ff" },
+    secondary: { main: "#edff00", dark: "#ff8600" },
   },
 });
 
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
-    primary: { main: "#ff0000" },
-    secondary: { main: "#fff" },
+    primary: { main: "#bb86fc", dark: "#3700b3" },
+    secondary: { main: "#03dac6", dark: "#00796B" },
   },
 });
 
-type ThemeMode = "light" | "dark";
-
 const App: FC = () => {
-  const [themeMode, setThemeMode] = useState<ThemeMode>("light");
+  const { themeMode } = useThemeContext();
   const [locale, setLocale] = useState<string>(initialLocale);
   const [messages, setMessages] = useState<typeof en_US>(en_US);
-
-  const toggleTheme = () =>
-    setThemeMode(themeMode === "light" ? "dark" : "light");
 
   const changeLocale = (newLocale: string) => {
     const isValidLocale = validateLocale(newLocale);

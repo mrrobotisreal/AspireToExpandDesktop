@@ -40,7 +40,7 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
   };
 
   return (
-    <AppBar position="fixed">
+    <AppBar color="primary" position="fixed">
       <Toolbar variant="dense">
         <IconButton
           edge="start"

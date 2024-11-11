@@ -12,6 +12,7 @@ import { useIntl } from "react-intl";
 
 import { AppFontStyle } from "../../constants/fonts";
 import { AppThemeMode } from "../../constants/theme";
+import { useThemeContext, ThemeMode } from "../../context/themeContext";
 import { useStudentContext } from "../../context/studentContext";
 import Layout from "../layout/layout";
 import Text from "../text/text";
@@ -19,11 +20,14 @@ import Toast from "../alerts/toast";
 
 const Settings: FC = () => {
   const intl = useIntl();
+  const { themeMode, toggleThemeMode } = useThemeContext();
   const { info, updateInfo } = useStudentContext();
-  const [selectedThemeMode, setSelectedThemeMode] =
-    useState<AppThemeMode>("system");
-  const [selectedFontFamily, setSelectedFontFamily] =
-    useState<AppFontStyle>("Bauhaus");
+  const [selectedThemeMode, setSelectedThemeMode] = useState<AppThemeMode>(
+    info.themeMode ?? "system"
+  );
+  const [selectedFontFamily, setSelectedFontFamily] = useState<AppFontStyle>(
+    info.fontStyle ?? "Bauhaus"
+  );
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(
     intl.formatMessage({ id: "common_settingsSaved_success" })
@@ -32,8 +36,11 @@ const Settings: FC = () => {
     "success"
   );
 
-  const handleSelectThemeMode = (event: SelectChangeEvent) =>
-    setSelectedThemeMode(event.target.value as AppThemeMode);
+  const handleSelectThemeMode = (event: SelectChangeEvent) => {
+    const value = event.target.value === "system" ? "light" : "dark"; // TODO: handle checking system for mode later
+    toggleThemeMode(value);
+    setSelectedThemeMode(value);
+  };
 
   const handleSelectFontStyle = (event: SelectChangeEvent) =>
     setSelectedFontFamily(event.target.value as AppFontStyle);
