@@ -187,7 +187,7 @@ const SideNav: FC<SideNavProps> = ({
             }
 
             return (
-              <>
+              <div key={item.id}>
                 <ListItem>
                   <ListItemButton onClick={handleClick}>
                     <ListItemIcon>{item.icon}</ListItemIcon>
@@ -202,7 +202,7 @@ const SideNav: FC<SideNavProps> = ({
                 <Collapse in={isOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     {item.children.map((subItem) => (
-                      <ListItem>
+                      <ListItem key={subItem.id}>
                         <ListItemButton
                           onClick={() => navigate(subItem.path!)}
                           sx={{ pl: 4 }}
@@ -218,11 +218,11 @@ const SideNav: FC<SideNavProps> = ({
                     ))}
                   </List>
                 </Collapse>
-              </>
+              </div>
             );
           } else {
             return (
-              <ListItem>
+              <ListItem key={item.id}>
                 <ListItemButton onClick={() => navigate(item.path!)}>
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText>
