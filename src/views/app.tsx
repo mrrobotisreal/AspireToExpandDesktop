@@ -8,6 +8,7 @@ import en_US from "../../locales/en_US.json";
 import StudentContextProvider from "../context/studentContext";
 
 import Login from "./login";
+import ProfileSettings from "./pages/profileSettings";
 import Settings from "./pages/settings";
 import StudentInfoForm from "./pages/studentInfoForm";
 
@@ -101,6 +102,7 @@ const App: FC = () => {
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/profile" element={<ProfileSettings />} />
               <Route path="/student-form" element={<StudentInfoForm />} />
               {/* <Route path="/home" element={} /> */}
               {/* <Route path="/classroom" element={} /> */}

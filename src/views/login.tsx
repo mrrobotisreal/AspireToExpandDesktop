@@ -43,6 +43,8 @@ const Login: FC = () => {
             firstName: body.first_name,
             lastName: body.last_name,
             emailAddress: body.email,
+            themeMode: "system",
+            fontStyle: "Bauhaus",
           });
           navigate("/student-form", {
             state: {
@@ -92,6 +94,10 @@ const Login: FC = () => {
             emailAddress: body.email_address,
             nativeLanguage: body.native_language,
             preferredLanguage: body.preferred_language,
+            themeMode: body.theme_mode,
+            fontStyle: body.font_style,
+            profilePicturePath: body.profile_picture_path,
+            timeZone: body.time_zone,
           });
           navigate("/settings");
         } else {

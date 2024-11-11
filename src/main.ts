@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "path";
 require("dotenv").config();
 
@@ -6,11 +6,15 @@ function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    fullscreen: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
+      webSecurity: false,
     },
   });
+
+  mainWindow.maximize();
 
   mainWindow.loadFile("index.html");
   if (process.env.NODE_ENV === "development") {
@@ -23,6 +27,27 @@ function createWindow(): void {
   }
 
   ipcMain.handle("get-locale", () => app.getLocale());
+  ipcMain.handle("select-image", async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ["openFile"],
+      filters: [
+        {
+          name: "Images",
+          extensions: ["jpg", "jpeg", "png", "gif"],
+        },
+      ],
+    });
+    console.log("Dialog result: ", result);
+
+    // TODO: figure out why TS shows an error here. Testing clearly shows that the implementation below works as expected and TS clearly has the types wrong.
+    // @ts-ignore
+    if (result.canceled) {
+      return null;
+    } else {
+      // @ts-ignore
+      return result.filePaths[0];
+    }
+  });
 }
 
 app.whenReady().then(() => createWindow());

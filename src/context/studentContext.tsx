@@ -6,6 +6,9 @@ import React, {
   useState,
 } from "react";
 
+import { AppFontStyle } from "../constants/fonts";
+import { AppThemeMode } from "../constants/theme";
+
 interface StudentInfo {
   firstName?: string;
   preferredName?: string;
@@ -13,6 +16,10 @@ interface StudentInfo {
   emailAddress?: string;
   nativeLanguage?: string;
   preferredLanguage?: string;
+  themeMode?: AppThemeMode;
+  fontStyle?: AppFontStyle;
+  profilePicturePath?: string;
+  timeZone?: string;
   // TODO: Add more fields
 }
 

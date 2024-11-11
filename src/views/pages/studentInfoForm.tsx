@@ -179,6 +179,8 @@ const StudentInfoForm: FC = () => {
           last_name: enteredLastName,
           email_address: emailAddress,
           password: shortenedHash,
+          theme_mode: "system",
+          font_style: "Bauhaus",
         }),
       });
       setIsConfirmInfoDialogOpen(false);

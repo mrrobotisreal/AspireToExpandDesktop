@@ -16,7 +16,9 @@ import {
   Settings as SettingsIcon,
 } from "@mui/icons-material";
 import { useIntl } from "react-intl";
+import { useNavigate } from "react-router-dom";
 
+import { useStudentContext } from "../../context/studentContext";
 import Text from "../text/text";
 
 interface TopNavProps {
@@ -26,6 +28,8 @@ interface TopNavProps {
 
 const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
   const intl = useIntl();
+  const navigate = useNavigate();
+  const { info } = useStudentContext();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -54,7 +58,11 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
         >
           {title}
         </Text>
-        <Avatar sx={{ ml: "auto" }} onClick={handleMenuOpen} />
+        <Avatar
+          src={info.profilePicturePath}
+          sx={{ ml: "auto" }}
+          onClick={handleMenuOpen}
+        />
         <Menu
           anchorEl={anchorEl}
           anchorOrigin={{
@@ -70,7 +78,10 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
           onClose={handleMenuClose}
         >
           <MenuItem
-            onClick={() => {}}
+            onClick={() => {
+              navigate("/profile");
+              handleMenuClose();
+            }}
             sx={{
               p: 2,
             }}
@@ -83,7 +94,10 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
             </Text>
           </MenuItem>
           <MenuItem
-            onClick={() => {}}
+            onClick={() => {
+              navigate("/settings");
+              handleMenuClose();
+            }}
             sx={{
               p: 2,
             }}
@@ -97,7 +111,10 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
           </MenuItem>
           <Divider />
           <MenuItem
-            onClick={() => {}}
+            onClick={() => {
+              navigate("/");
+              handleMenuClose();
+            }}
             sx={{
               p: 2,
             }}
