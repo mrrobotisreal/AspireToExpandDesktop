@@ -8,7 +8,7 @@ import React, {
 
 import { AppFontStyle } from "../constants/fonts";
 import { MAIN_SERVER_URL } from "../constants/urls";
-import { ThemeMode } from "../context/themeContext";
+import { ThemeMode } from "./themeContext";
 
 interface StudentInfo {
   firstName?: string;

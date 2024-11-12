@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 
 import { useThemeContext } from "../context/themeContext";
 import { useStudentContext } from "../context/studentContext";
+import { useMessagesContext } from "../context/messagesContext";
 import { MAIN_SERVER_URL } from "../constants/urls";
 
 import CircularLoading from "./loading/circular";
@@ -16,6 +17,7 @@ const Login: FC = () => {
   const navigate = useNavigate();
   const { toggleThemeMode } = useThemeContext();
   const { updateInfo } = useStudentContext();
+  const { changeLocale } = useMessagesContext();
   const [isLoginVisible, setIsLoginVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [registrationCode, setRegistrationCode] = useState("");
@@ -107,6 +109,9 @@ const Login: FC = () => {
               ? "light"
               : body.theme_mode
           );
+          if (body.preferred_language) {
+            changeLocale(body.preferred_language);
+          }
           navigate("/home");
         } else {
           console.error("Invalid email address or password!"); // TODO: localize; add toast

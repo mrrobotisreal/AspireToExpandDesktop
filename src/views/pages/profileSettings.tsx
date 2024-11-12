@@ -12,6 +12,7 @@ import {
 import { useIntl } from "react-intl";
 
 import { useStudentContext } from "../../context/studentContext";
+import { useMessagesContext } from "../../context/messagesContext";
 import Layout from "../layout/layout";
 import Text from "../text/text";
 import Toast from "../alerts/toast";
@@ -19,6 +20,7 @@ import Toast from "../alerts/toast";
 const ProfileSettings: FC = () => {
   const intl = useIntl();
   const { info, updateInfo, updateInfoOnServer } = useStudentContext();
+  const { changeLocale } = useMessagesContext();
   const [profilePicturePath, setProfilePicturePath] = useState(
     info.profilePicturePath ?? ""
   );
@@ -46,8 +48,10 @@ const ProfileSettings: FC = () => {
     }
   };
 
-  const handlePreferredLanguage = (event: SelectChangeEvent) =>
+  const handlePreferredLanguage = (event: SelectChangeEvent) => {
     setPreferredLanguage(event.target.value as string);
+    changeLocale(event.target.value as string);
+  };
 
   const handleUpdateSettingsOnServer = async () => {
     if (!info.emailAddress || info.emailAddress === "") {
