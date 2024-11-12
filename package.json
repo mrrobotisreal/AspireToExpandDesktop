@@ -22,16 +22,20 @@
     }
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js && tsc",
-    "react-dev": "webpack serve --config webpack.config.js",
+    "build": "webpack --config webpack.config.cjs && tsc",
+    "build-node": "tsc -p tsconfig.node.json",
+    "react-dev": "webpack serve --config webpack.config.cjs --watch",
     "start": "NODE_ENV=development tsc && electron .",
+    "start-node": "NODE_ENV=development tsc -p tsconfig.node.json && electron .",
+    "wstart": "cross-env NODE_ENV=development tsc && electron .",
+    "wstart-node": "cross-env NODE_ENV=development tsc -p tsconfig.node.json && electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
   "keywords": [],
   "author": "Mitchell Wintrow",
   "license": "ISC",
-  "description": "An educational desktop application for learning the English language.",
+  "description": "An educational desktop application for learning the English language, particularly for native Ukrainian and native Russian speakers, but also for native German speakers. In the future, this will also be extended to native Spanish, Vietnamese, Hebrew, Arabic, and French speakers. If you are interested in contributing to this project or you'd like to extend support for a language not yet listed, please contact me at iamwintrow@gmail.com. Thanks!",
   "devDependencies": {
     "@electron/packager": "^18.3.5",
     "@types/bcryptjs": "^2.4.6",

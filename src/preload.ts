@@ -7,6 +7,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getVideoServerURL: () => process.env.VIDEO_SERVER_URL,
   getChatServerURL: () => process.env.CHAT_SERVER_URL,
   getSalt: () => process.env.SALT,
+  getCwd: () => process.cwd(),
+  createWebSocketConnection: (url: string) => new WebSocket(url),
 });
 
 window.addEventListener("DOMContentLoaded", () => {

@@ -5,6 +5,8 @@ export interface ElectronAPI {
   getVideoServerURL: () => string;
   getChatServerURL: () => string;
   getSalt: () => string;
+  getCwd: () => string;
+  createWebSocketConnection: (url: string) => WebSocket;
 }
 
 declare global {

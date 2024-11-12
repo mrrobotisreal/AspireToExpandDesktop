@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "path";
-require("dotenv").config();
+import "dotenv/config";
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -11,6 +11,7 @@ function createWindow(): void {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       webSecurity: false,
+      nodeIntegration: false,
     },
   });
 
