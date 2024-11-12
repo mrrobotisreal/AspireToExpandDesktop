@@ -19,6 +19,7 @@ import { useIntl } from "react-intl";
 import { useNavigate } from "react-router-dom";
 
 import { useStudentContext } from "../../context/studentContext";
+import { useThemeContext } from "../../context/themeContext";
 import Text from "../text/text";
 
 interface TopNavProps {
@@ -30,6 +31,7 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
   const intl = useIntl();
   const navigate = useNavigate();
   const { info } = useStudentContext();
+  const { regularFont, heavyFont } = useThemeContext();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -52,7 +54,7 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
         </IconButton>
         <Text
           variant="h5"
-          fontFamily="Bauhaus-Heavy"
+          fontFamily={heavyFont}
           textAlign="center"
           sx={{ flexGrow: 1 }}
         >
@@ -89,7 +91,7 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
             <ListItemIcon>
               <AccountCircleIcon />
             </ListItemIcon>
-            <Text variant="body1">
+            <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({ id: "account_profileSettings" })}
             </Text>
           </MenuItem>
@@ -105,7 +107,7 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
-            <Text variant="body1">
+            <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({ id: "account_appSettings" })}
             </Text>
           </MenuItem>
@@ -122,7 +124,7 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
             <ListItemIcon>
               <LogoutIcon />
             </ListItemIcon>
-            <Text variant="body1">
+            <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({ id: "common_logout" })}
             </Text>
           </MenuItem>

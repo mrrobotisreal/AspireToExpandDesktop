@@ -8,6 +8,8 @@ import {
 } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
 
+import { useThemeContext } from "../../context/themeContext";
+
 const defaultAutoHideDuration = 6000;
 
 const Transition = React.forwardRef(function Transition(
@@ -26,6 +28,8 @@ interface ToastProps {
 }
 
 const Toast: FC<ToastProps> = ({ message, alertProps, snackbarProps }) => {
+  const { regularFont } = useThemeContext();
+
   return (
     <Snackbar
       autoHideDuration={
@@ -35,7 +39,11 @@ const Toast: FC<ToastProps> = ({ message, alertProps, snackbarProps }) => {
       TransitionComponent={Transition}
       {...snackbarProps}
     >
-      <Alert variant="filled" sx={{ width: "100%" }} {...alertProps}>
+      <Alert
+        variant="filled"
+        sx={{ width: "100%", fontFamily: regularFont }}
+        {...alertProps}
+      >
         {message}
       </Alert>
     </Snackbar>

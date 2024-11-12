@@ -30,6 +30,7 @@ import { useIntl } from "react-intl";
 import { useNavigate } from "react-router-dom";
 
 import Text from "../text/text";
+import { useThemeContext } from "../../context/themeContext";
 
 interface SideNavSubItem {
   id: string;
@@ -131,6 +132,7 @@ const SideNav: FC<SideNavProps> = ({
 }: SideNavProps) => {
   const intl = useIntl();
   const navigate = useNavigate();
+  const { regularFont, heavyFont } = useThemeContext();
   const [assignmentsAreOpen, setAssignmentsAreOpen] = useState(false);
   const [gamesAreOpen, setGamesAreOpen] = useState(false);
   const [settingsAreOpen, setSettingsAreOpen] = useState(false);
@@ -160,7 +162,7 @@ const SideNav: FC<SideNavProps> = ({
           variant="h6"
           textAlign="center"
           color="white"
-          fontFamily="Bauhaus-Heavy"
+          fontFamily={heavyFont}
         >
           {intl.formatMessage({ id: "common_menuTitle" })}
         </Text>
@@ -192,7 +194,7 @@ const SideNav: FC<SideNavProps> = ({
                   <ListItemButton onClick={handleClick}>
                     <ListItemIcon>{item.icon}</ListItemIcon>
                     <ListItemText>
-                      <Text variant="body1">
+                      <Text variant="body1" fontFamily={regularFont}>
                         {intl.formatMessage({ id: item.id })}
                       </Text>
                     </ListItemText>
@@ -209,7 +211,7 @@ const SideNav: FC<SideNavProps> = ({
                         >
                           <ListItemIcon>{subItem.icon}</ListItemIcon>
                           <ListItemText>
-                            <Text variant="body1">
+                            <Text variant="body1" fontFamily={regularFont}>
                               {intl.formatMessage({ id: subItem.id })}
                             </Text>
                           </ListItemText>
@@ -226,7 +228,7 @@ const SideNav: FC<SideNavProps> = ({
                 <ListItemButton onClick={() => navigate(item.path!)}>
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText>
-                    <Text variant="body1">
+                    <Text variant="body1" fontFamily={regularFont}>
                       {intl.formatMessage({ id: item.id })}
                     </Text>
                   </ListItemText>
@@ -249,7 +251,7 @@ const SideNav: FC<SideNavProps> = ({
               <LogoutTwoTone />
             </ListItemIcon>
             <ListItemText>
-              <Text variant="body1">
+              <Text variant="body1" fontFamily={regularFont}>
                 {intl.formatMessage({ id: "menu_logout" })}
               </Text>
             </ListItemText>

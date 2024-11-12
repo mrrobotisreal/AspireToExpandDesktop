@@ -15,7 +15,13 @@ import Text from "./text/text";
 const Login: FC = () => {
   const intl = useIntl();
   const navigate = useNavigate();
-  const { toggleThemeMode } = useThemeContext();
+  const {
+    toggleThemeMode,
+    changeFontStyle,
+    lightFont,
+    regularFont,
+    heavyFont,
+  } = useThemeContext();
   const { updateInfo } = useStudentContext();
   const { changeLocale } = useMessagesContext();
   const [isLoginVisible, setIsLoginVisible] = useState(false);
@@ -112,6 +118,9 @@ const Login: FC = () => {
           if (body.preferred_language) {
             changeLocale(body.preferred_language);
           }
+          if (body.font_style) {
+            changeFontStyle(body.font_style);
+          }
           navigate("/home");
         } else {
           console.error("Invalid email address or password!"); // TODO: localize; add toast
@@ -134,28 +143,28 @@ const Login: FC = () => {
         minWidth: 400,
       }}
     >
-      <Text variant="subtitle1" textAlign="center">
+      <Text variant="subtitle1" textAlign="center" fontFamily={regularFont}>
         {intl.formatMessage({
           id: isLoginVisible
             ? "welcomeScreen_loginTitle"
             : "welcomeScreen_welcomeTitle",
         })}
       </Text>
-      <Text variant="h4" fontFamily="Bauhaus-Heavy" textAlign="center">
+      <Text variant="h4" fontFamily={heavyFont} textAlign="center">
         {intl.formatMessage({ id: "appTitle" })}!
       </Text>
       <br />
       {isLoginVisible ? (
         <Stack direction="column" alignContent="space-evenly" spacing={4}>
           <div>
-            <Text variant="body1" fontWeight="bold">
+            <Text variant="body1" fontWeight="bold" fontFamily={regularFont}>
               {intl.formatMessage({ id: "welcomeScreen_inputEmail" })}:
             </Text>
             <TextField
               fullWidth
               variant="outlined"
               label={
-                <Text variant="body1">
+                <Text variant="body1" fontFamily={regularFont}>
                   {intl.formatMessage({ id: "common_emailAddress" })}
                 </Text>
               }
@@ -166,14 +175,14 @@ const Login: FC = () => {
             />
           </div>
           <div>
-            <Text variant="body1" fontWeight="bold">
+            <Text variant="body1" fontWeight="bold" fontFamily={regularFont}>
               {intl.formatMessage({ id: "welcomeScreen_inputPassword" })}:
             </Text>
             <TextField
               fullWidth
               variant="outlined"
               label={
-                <Text variant="body1">
+                <Text variant="body1" fontFamily={regularFont}>
                   {intl.formatMessage({ id: "common_passwordTitle" })}
                 </Text>
               }
@@ -187,14 +196,14 @@ const Login: FC = () => {
         </Stack>
       ) : (
         <>
-          <Text variant="body1" fontWeight="bold">
+          <Text variant="body1" fontWeight="bold" fontFamily={regularFont}>
             {intl.formatMessage({ id: "registrationCodeInputLabel" })}:
           </Text>
           <TextField
             fullWidth
             variant="outlined"
             label={
-              <Text variant="body1">
+              <Text variant="body1" fontFamily={regularFont}>
                 {intl.formatMessage({ id: "registrationCodeInputHint" })}
               </Text>
             }
@@ -204,7 +213,7 @@ const Login: FC = () => {
             }
           />
           <FormHelperText>
-            <Text variant="caption" fontFamily="Bauhaus-Light">
+            <Text variant="caption" fontFamily={lightFont}>
               {intl.formatMessage({ id: "registrationCodeInputHelperText" })}
             </Text>
           </FormHelperText>
@@ -216,7 +225,7 @@ const Login: FC = () => {
           variant="text"
           onClick={() => setIsLoginVisible(!isLoginVisible)}
         >
-          <Text variant="body2">
+          <Text variant="body2" fontFamily={regularFont}>
             {intl.formatMessage({
               id: isLoginVisible
                 ? "welcomeScreen_notRegisteredYetButton"
@@ -239,7 +248,7 @@ const Login: FC = () => {
           {isLoading ? (
             <CircularLoading />
           ) : (
-            <Text variant="button">
+            <Text variant="button" fontFamily={regularFont}>
               {intl.formatMessage({
                 id: isLoginVisible
                   ? "common_login"

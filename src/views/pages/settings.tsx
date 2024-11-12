@@ -19,7 +19,8 @@ import Toast from "../alerts/toast";
 
 const Settings: FC = () => {
   const intl = useIntl();
-  const { themeMode, toggleThemeMode } = useThemeContext();
+  const { toggleThemeMode, changeFontStyle, heavyFont, regularFont } =
+    useThemeContext();
   const { info, updateInfo, updateInfoOnServer } = useStudentContext();
   const [selectedThemeMode, setSelectedThemeMode] = useState<ThemeMode>(
     info.themeMode ?? "light"
@@ -41,8 +42,10 @@ const Settings: FC = () => {
     setSelectedThemeMode(value);
   };
 
-  const handleSelectFontStyle = (event: SelectChangeEvent) =>
+  const handleSelectFontStyle = (event: SelectChangeEvent) => {
+    changeFontStyle(event.target.value as AppFontStyle);
     setSelectedFontFamily(event.target.value as AppFontStyle);
+  };
 
   const handleUpdateSettingsOnServer = async () => {
     if (!info.emailAddress || info.emailAddress === "") {
@@ -84,15 +87,15 @@ const Settings: FC = () => {
 
   return (
     <Layout title={intl.formatMessage({ id: "common_settingsTitle" })}>
-      <Text variant="h4" fontFamily="Bauhaus-Heavy">
+      <Text variant="h4" fontFamily={heavyFont}>
         {intl.formatMessage({ id: "account_appSettings" })}
       </Text>
-      <Text variant="body1">
+      <Text variant="body1" fontFamily={regularFont}>
         {intl.formatMessage({ id: "account_appSettings_description" })}
       </Text>
       <br />
       <br />
-      <Text variant="h6" fontWeight="bold" fontFamily="Bauhaus-Heavy">
+      <Text variant="h6" fontWeight="bold" fontFamily={heavyFont}>
         {intl.formatMessage({ id: "account_appSettings_themeMode" })}:
       </Text>
       <FormControl sx={{ minWidth: 300 }}>
@@ -102,14 +105,14 @@ const Settings: FC = () => {
           onChange={handleSelectThemeMode}
         >
           <MenuItem value="light">
-            <Text variant="body1">
+            <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({
                 id: "account_appSettings_themeMode_lightTheme",
               })}
             </Text>
           </MenuItem>
           <MenuItem value="dark">
-            <Text variant="body1">
+            <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({
                 id: "account_appSettings_themeMode_darkTheme",
               })}
@@ -119,7 +122,7 @@ const Settings: FC = () => {
       </FormControl>
       <br />
       <br />
-      <Text variant="h6" fontWeight="bold" fontFamily="Bauhaus-Heavy">
+      <Text variant="h6" fontWeight="bold" fontFamily={heavyFont}>
         {intl.formatMessage({ id: "account_appSettings_fontStyle" })}:
       </Text>
       <FormControl sx={{ minWidth: 300 }}>
@@ -129,7 +132,7 @@ const Settings: FC = () => {
           onChange={handleSelectFontStyle}
         >
           <MenuItem value="Bauhaus">
-            <Text variant="body1">
+            <Text variant="body1" fontFamily="Bauhaus-Medium">
               {intl.formatMessage({
                 id: "account_appSettings_fontStyle_bauhaus",
               })}
@@ -187,7 +190,9 @@ const Settings: FC = () => {
           color="primary"
           onClick={handleUpdateSettings}
         >
-          {intl.formatMessage({ id: "common_settings_save" })}
+          <Text variant="body1" fontFamily={regularFont}>
+            {intl.formatMessage({ id: "common_settings_save" })}
+          </Text>
         </Button>
       </Box>
       <Toast
