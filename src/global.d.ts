@@ -6,7 +6,9 @@ export interface ElectronAPI {
   getChatServerURL: () => string;
   getSalt: () => string;
   getCwd: () => string;
-  createWebSocketConnection: (url: string) => WebSocket;
+  connectChatWebSocket: (studentId: string) => void;
+  sendMessage: (message: { from: string; to: string; content: string }) => void;
+  onNewMessage: (callback: (message: any) => void) => void;
 }
 
 declare global {

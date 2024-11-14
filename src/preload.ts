@@ -8,7 +8,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getChatServerURL: () => process.env.CHAT_SERVER_URL,
   getSalt: () => process.env.SALT,
   getCwd: () => process.cwd(),
-  createWebSocketConnection: (url: string) => new WebSocket(url),
+  connectChatWebSocket: (studentId: string) =>
+    ipcRenderer.send("login", studentId),
+  sendMessage: (message: { from: string; to: string; content: string }) =>
+    ipcRenderer.send("send-message", message),
+  onNewMessage: (callback: (message: any) => void) =>
+    ipcRenderer.on("new-message", (_, message) => callback(message)),
 });
 
 window.addEventListener("DOMContentLoaded", () => {

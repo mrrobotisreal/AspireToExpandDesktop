@@ -86,6 +86,7 @@ const Login: FC = () => {
         const salt = window.electronAPI.getSalt();
         const hashedPassword = bcrypt.hashSync(password, salt);
         const shortenedHash = hashedPassword.slice(0, 32);
+        console.log("Hashed password: ", shortenedHash);
         const response = await fetch(`${MAIN_SERVER_URL}/validate/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json; charset=UTF-8" },
@@ -97,6 +98,7 @@ const Login: FC = () => {
 
         if (response.status === 200) {
           const body = await response.json();
+          console.log("User info: ", JSON.stringify(body, null, 2));
 
           updateInfo({
             firstName: body.first_name,
@@ -120,6 +122,13 @@ const Login: FC = () => {
           }
           if (body.font_style) {
             changeFontStyle(body.font_style);
+          }
+          if (body.student_id) {
+            window.electronAPI.connectChatWebSocket(body.student_id);
+          } else {
+            console.error(
+              "Student ID not found in response, cannot connect to chat server!"
+            ); // TODO: localize; add toast
           }
           navigate("/home");
         } else {
