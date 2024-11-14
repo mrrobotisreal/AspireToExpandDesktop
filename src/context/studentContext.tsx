@@ -11,6 +11,7 @@ import { MAIN_SERVER_URL } from "../constants/urls";
 import { ThemeMode } from "./themeContext";
 
 interface StudentInfo {
+  studentId?: string;
   firstName?: string;
   preferredName?: string;
   lastName?: string;
@@ -26,12 +27,24 @@ interface StudentInfo {
 
 interface StudentInfoContext {
   info: StudentInfo;
+  getInfo: () => StudentInfo | null;
+  removeInfo: () => void;
   updateInfo: (newInfo: StudentInfo) => void;
   updateInfoOnServer: (newInfo: UpdateStudentInfoRequest) => Promise<void>;
 }
 
+const getInfo = () => {
+  const info = localStorage.getItem("studentInfo");
+
+  return info ? JSON.parse(info) : null;
+};
+
+const removeInfo = () => localStorage.removeItem("studentInfo");
+
 const StudentContext = createContext<StudentInfoContext>({
   info: {},
+  getInfo,
+  removeInfo,
   updateInfo: () => {},
   updateInfoOnServer: async () => {},
 });
@@ -40,6 +53,7 @@ export const useStudentContext = () =>
   useContext<StudentInfoContext>(StudentContext);
 
 interface UpdateStudentInfoRequest {
+  student_id?: string;
   email_address: string;
   preferred_name?: string;
   preferred_language?: string;
@@ -75,10 +89,13 @@ const StudentProvider: FC<StudentProviderProps> = ({ children }) => {
 
   const updateInfo = (newInfo: StudentInfo) => {
     setStudentInfo(newInfo);
+    localStorage.setItem("studentInfo", JSON.stringify(newInfo));
   };
 
   const values = {
     info: studentInfo,
+    getInfo,
+    removeInfo,
     updateInfo,
     updateInfoOnServer,
   };

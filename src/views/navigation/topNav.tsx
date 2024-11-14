@@ -30,7 +30,7 @@ interface TopNavProps {
 const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
   const intl = useIntl();
   const navigate = useNavigate();
-  const { info } = useStudentContext();
+  const { info, removeInfo } = useStudentContext();
   const { regularFont, heavyFont } = useThemeContext();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -115,6 +115,7 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
           <MenuItem
             onClick={() => {
               navigate("/");
+              removeInfo();
               handleMenuClose();
             }}
             sx={{

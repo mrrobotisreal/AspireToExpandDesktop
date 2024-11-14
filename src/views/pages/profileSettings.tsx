@@ -164,32 +164,32 @@ const ProfileSettings: FC = () => {
       </Text>
       <FormControl sx={{ minWidth: 300 }}>
         <Select id="timeZone" value={timeZone} onChange={handleSetTimeZone}>
-          <MenuItem value="US Pacific (GMT-8/GMT-7)">
+          <MenuItem value="timeZone_us_pacific">
             <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({ id: "timeZone_us_pacific" })}
             </Text>
           </MenuItem>
-          <MenuItem value="US Mountain (GMT-7/GMT-6)">
+          <MenuItem value="timeZone_us_mountain">
             <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({ id: "timeZone_us_mountain" })}
             </Text>
           </MenuItem>
-          <MenuItem value="US Central (GMT-6/GMT-5)">
+          <MenuItem value="timeZone_us_central">
             <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({ id: "timeZone_us_central" })}
             </Text>
           </MenuItem>
-          <MenuItem value="US Eastern (GMT-5/GMT-4)">
+          <MenuItem value="timeZone_us_eastern">
             <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({ id: "timeZone_us_eastern" })}
             </Text>
           </MenuItem>
-          <MenuItem value="Austria (GMT+1/GMT+2)">
+          <MenuItem value="timeZone_at_vienna">
             <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({ id: "timeZone_at_vienna" })}
             </Text>
           </MenuItem>
-          <MenuItem value="Ukraine (GMT+2/GMT+3)">
+          <MenuItem value="timeZone_ua_kyiv">
             <Text variant="body1" fontFamily={regularFont}>
               {intl.formatMessage({ id: "timeZone_ua_kyiv" })}
             </Text>

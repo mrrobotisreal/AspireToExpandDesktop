@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { Button, FormHelperText, Paper, Stack, TextField } from "@mui/material";
 import { useIntl } from "react-intl";
 import { useNavigate } from "react-router-dom";
@@ -22,9 +22,9 @@ const Login: FC = () => {
     regularFont,
     heavyFont,
   } = useThemeContext();
-  const { updateInfo } = useStudentContext();
+  const { getInfo, updateInfo } = useStudentContext();
   const { changeLocale } = useMessagesContext();
-  const [isLoginVisible, setIsLoginVisible] = useState(false);
+  const [isLoginVisible, setIsLoginVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [registrationCode, setRegistrationCode] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
@@ -86,7 +86,6 @@ const Login: FC = () => {
         const salt = window.electronAPI.getSalt();
         const hashedPassword = bcrypt.hashSync(password, salt);
         const shortenedHash = hashedPassword.slice(0, 32);
-        console.log("Hashed password: ", shortenedHash);
         const response = await fetch(`${MAIN_SERVER_URL}/validate/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json; charset=UTF-8" },
@@ -98,9 +97,9 @@ const Login: FC = () => {
 
         if (response.status === 200) {
           const body = await response.json();
-          console.log("User info: ", JSON.stringify(body, null, 2));
 
           updateInfo({
+            studentId: body.student_id,
             firstName: body.first_name,
             preferredName: body.preferred_name,
             lastName: body.last_name,
@@ -142,6 +141,15 @@ const Login: FC = () => {
       throw error;
     }
   };
+
+  useEffect(() => {
+    const storedStudentInfo = getInfo();
+
+    if (storedStudentInfo) {
+      updateInfo(storedStudentInfo);
+      navigate("/home");
+    }
+  }, []);
 
   return (
     <Paper
