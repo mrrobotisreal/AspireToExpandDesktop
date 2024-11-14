@@ -26,7 +26,7 @@ import Text from "../text/text";
 
 const Classroom: FC = () => {
   const intl = useIntl();
-  const { info } = useStudentContext();
+  const { info, getInfo, updateInfo } = useStudentContext();
   const { regularFont, heavyFont } = useThemeContext();
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -51,8 +51,6 @@ const Classroom: FC = () => {
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [videoDevices, setVideoDevices] = useState<MediaStreamTrack[]>([]);
   const [selectedVideoDevice, setSelectedVideoDevice] = useState("Default");
-  const [isLocalVideoReady, setIsLocalVideoReady] = useState(false);
-  const [isRemoteVideoReady, setIsRemoteVideoReady] = useState(false);
   const [callSettingsAnchorEl, setCallSettingsAnchorEl] =
     useState<null | HTMLElement>(null);
   const [callSettingsMenuIsOpen, setCallSettingsMenuIsOpen] = useState(false);
@@ -156,7 +154,6 @@ const Classroom: FC = () => {
         remoteVideoRef.current.srcObject = stream;
       }
       setRemoteStream(stream);
-      setIsRemoteVideoReady(true);
     };
 
     startMedia();
@@ -172,6 +169,16 @@ const Classroom: FC = () => {
     await peerConnection.current.setLocalDescription(offer);
     socket.send(JSON.stringify({ event: "offer", payload: offer }));
   };
+
+  useEffect(() => {
+    const storedStudentInfo = getInfo();
+
+    // TODO: Remove this useEffect in production;
+    // This is just for testing purposes to keep info updated during refreshes
+    if (storedStudentInfo) {
+      updateInfo(storedStudentInfo);
+    }
+  }, []);
 
   return (
     <Layout title={"Classroom"}>
@@ -190,27 +197,6 @@ const Classroom: FC = () => {
           }}
         />
       </Tooltip>
-      {/* {isRemoteVideoReady ? (
-        <Tooltip title="Alina's video" placement="top" arrow>
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            style={{
-              height: "38vh",
-              width: "100%",
-              border: "1px solid black",
-              borderRadius: "6px",
-            }}
-          />
-        </Tooltip>
-      ) : (
-        <Tooltip title="Alina's video" placement="top" arrow>
-          <Box sx={{ mb: 0.5 }}>
-            <Skeleton variant="rectangular" animation="wave" height="38vh" />
-          </Box>
-        </Tooltip>
-      )} */}
       <Tooltip title="Your local video" placement="bottom" arrow>
         <video
           ref={localVideoRef}
@@ -226,27 +212,6 @@ const Classroom: FC = () => {
           }}
         />
       </Tooltip>
-      {/* {isLocalVideoReady ? (
-        <Tooltip title="Your local video" placement="bottom" arrow>
-          <video
-            ref={localVideoRef}
-            autoPlay
-            playsInline
-            style={{
-              height: "38vh",
-              width: "100%",
-              border: "1px solid black",
-              borderRadius: "6px",
-            }}
-          />
-        </Tooltip>
-      ) : (
-        <Tooltip title="Your local video" placement="bottom" arrow>
-          <Box sx={{ mt: 0.5 }}>
-            <Skeleton variant="rectangular" animation="wave" height="38vh" />
-          </Box>
-        </Tooltip>
-      )} */}
       <Box padding={2}>
         <Stack direction="row" justifyContent="space-evenly">
           <IconButton

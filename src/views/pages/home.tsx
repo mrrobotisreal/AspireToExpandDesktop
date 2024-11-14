@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { useIntl } from "react-intl";
 
 import { useStudentContext } from "../../context/studentContext";
@@ -8,9 +8,19 @@ import Text from "../text/text";
 
 const Home: FC = () => {
   const intl = useIntl();
-  const { info } = useStudentContext();
+  const { info, getInfo, updateInfo } = useStudentContext();
   const { regularFont, heavyFont } = useThemeContext();
   const { firstName } = info;
+
+  useEffect(() => {
+    const storedStudentInfo = getInfo();
+
+    // TODO: Remove this useEffect in production;
+    // This is just for testing purposes to keep info updated during refreshes
+    if (storedStudentInfo) {
+      updateInfo(storedStudentInfo);
+    }
+  }, []);
 
   return (
     <Layout title={intl.formatMessage({ id: "common_home" })}>
