@@ -130,6 +130,7 @@ interface ChatWindowProps {
   handleClickAttach: () => void;
   handleClickSend: (name: string, toID: string) => void;
   externalChatBackgroundColor: string;
+  textControlsBackgroundColor: string;
 }
 
 const ChatWindow: FC<ChatWindowProps> = ({
@@ -143,6 +144,7 @@ const ChatWindow: FC<ChatWindowProps> = ({
   handleClickAttach,
   handleClickSend,
   externalChatBackgroundColor,
+  textControlsBackgroundColor,
 }) => {
   return (
     <Box sx={{ pl: 2, pt: 1, pb: 1 }}>
@@ -208,7 +210,7 @@ const ChatWindow: FC<ChatWindowProps> = ({
           border: "1px solid #ddd",
           borderBottomLeftRadius: "6px",
           borderBottomRightRadius: "6px",
-          backgroundColor: "#f7f7f7",
+          backgroundColor: textControlsBackgroundColor,
         }}
       >
         <IconButton
@@ -224,7 +226,7 @@ const ChatWindow: FC<ChatWindowProps> = ({
           multiline
           maxRows={4}
           placeholder="Type a message..."
-          sx={{ ml: 1, mr: 1 }}
+          sx={{ ml: 1, mr: 1, backgroundColor: "#ffffff", borderRadius: "6px" }}
           disabled={!Boolean(selectedChat)}
           value={textMessage}
           onChange={handleTextMessageChange}
@@ -232,7 +234,7 @@ const ChatWindow: FC<ChatWindowProps> = ({
         <IconButton
           disabled={!Boolean(selectedChat)}
           onClick={() => handleClickSend(name, toID)}
-          color="primary"
+          color="secondary"
         >
           <SendTwoTone />
         </IconButton>
@@ -358,6 +360,7 @@ const Chat: FC = () => {
             handleClickAttach={handleClickAttach}
             handleClickSend={handleClickSend}
             externalChatBackgroundColor={theme.palette.primary.light}
+            textControlsBackgroundColor={"#b7b7b7"}
           />
         </Grid>
       </Grid>
