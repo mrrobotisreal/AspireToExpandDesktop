@@ -32,8 +32,15 @@ function connectChatWebSocket(studentId: string) {
 }
 
 ipcMain.on("send-message", (_, message) => {
+  console.log("Sending socket message...");
   if (socket && socket.readyState === WebSocket.OPEN) {
+    console.log("For sure sending socket message...");
     socket.send(JSON.stringify(message));
+  }
+
+  if (socket && socket.readyState === WebSocket.CLOSED) {
+    console.log("Reconnecting to chat server... Try sending message again...");
+    connectChatWebSocket(message.fromID);
   }
 });
 

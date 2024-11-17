@@ -4,10 +4,18 @@ export interface ElectronAPI {
   getMainServerURL: () => string;
   getVideoServerURL: () => string;
   getChatServerURL: () => string;
+  getChatHttpServerURL: () => string;
   getSalt: () => string;
   getCwd: () => string;
   connectChatWebSocket: (studentId: string) => void;
-  sendMessage: (message: { from: string; to: string; content: string }) => void;
+  sendMessage: (message: {
+    from: string;
+    fromID: string;
+    to: string;
+    toID: string;
+    content: string;
+    time: number;
+  }) => void;
   onNewMessage: (callback: (message: any) => void) => void;
 }
 

@@ -1,13 +1,15 @@
 import React, { FC, useEffect, useState } from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import { IntlProvider } from "react-intl";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
 import StudentContextProvider from "../context/studentContext";
+import ChatContextProvider from "../context/chatContext";
 import { useThemeContext } from "../context/themeContext";
 import { useMessagesContext } from "../context/messagesContext";
 
 import Login from "./login";
+import Chat from "./pages/chat";
 import Classroom from "./pages/classroom";
 import Home from "./pages/home";
 import ProfileSettings from "./pages/profileSettings";
@@ -25,24 +27,8 @@ async function getLocale(): Promise<string> {
 }
 getLocale();
 
-const lightTheme = createTheme({
-  palette: {
-    mode: "light",
-    primary: { main: "#007bff", light: "#8dd0ff" },
-    secondary: { main: "#edff00", dark: "#ff8600" },
-  },
-});
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: { main: "#bb86fc", dark: "#3700b3" },
-    secondary: { main: "#03dac6", dark: "#00796B" },
-  },
-});
-
 const App: FC = () => {
-  const { themeMode } = useThemeContext();
+  const { themeMode, theme } = useThemeContext();
   const { locale, messages, changeLocale } = useMessagesContext();
 
   useEffect(() => {
@@ -51,23 +37,25 @@ const App: FC = () => {
 
   return (
     <IntlProvider locale={locale} messages={messages}>
-      <ThemeProvider theme={themeMode === "light" ? lightTheme : darkTheme}>
+      <ThemeProvider theme={theme}>
         <StudentContextProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/profile" element={<ProfileSettings />} />
-              <Route path="/student-form" element={<StudentInfoForm />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/classroom" element={<Classroom />} />
-              {/* <Route path="/chat" element={} /> */}
-              {/* <Route path="/lessons" element={} /> */}
-              {/* <Route path="/assignments" element={} /> */}
-              {/* <Route path="/games" element={} /> */}
-              {/* <Route path="/profile" element={} /> */}
-            </Routes>
-          </Router>
+          <ChatContextProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/profile" element={<ProfileSettings />} />
+                <Route path="/student-form" element={<StudentInfoForm />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/classroom" element={<Classroom />} />
+                <Route path="/chat" element={<Chat />} />
+                {/* <Route path="/lessons" element={} /> */}
+                {/* <Route path="/assignments" element={} /> */}
+                {/* <Route path="/games" element={} /> */}
+                {/* <Route path="/profile" element={} /> */}
+              </Routes>
+            </Router>
+          </ChatContextProvider>
         </StudentContextProvider>
       </ThemeProvider>
     </IntlProvider>
