@@ -6,7 +6,9 @@ import React, {
   useState,
 } from "react";
 
-import { HTTP_CHAT_SERVER_URL } from "../constants/urls";
+import { HTTP_CHAT_SERVER_URL, MAIN_SERVER_URL } from "../constants/urls";
+
+import { useStudentContext } from "./studentContext";
 
 export interface ChatMessage {
   from: string;
@@ -31,13 +33,20 @@ const getChatID = (message: ChatMessage): string => {
   return `${message.toID}_${message.fromID}`;
 };
 
+export interface Student {
+  studentid: string;
+  preferredname: string;
+  emailaddress: string;
+}
+
 interface ChatContextProps {
   chats: Chat[];
   fetchChats: (studentId: string) => void;
   messages: ChatMessage[];
   fetchMessages: (chatId: string) => void;
   sendMessage: (message: ChatMessage) => void;
-  // TODO: implement search for users
+  students: Student[];
+  fetchAllStudents: () => Promise<string[]>;
 }
 
 const ChatContext = createContext<ChatContextProps>({
@@ -46,13 +55,17 @@ const ChatContext = createContext<ChatContextProps>({
   messages: [],
   fetchMessages: async (chatId: string) => {},
   sendMessage: async (message: ChatMessage) => {},
+  students: [],
+  fetchAllStudents: async () => [],
 });
 
 export const useChatContext = () => useContext<ChatContextProps>(ChatContext);
 
 const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  const { info } = useStudentContext();
   const [chats, setChats] = useState<Chat[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
 
   const fetchChats = async (studentId: string) => {
     try {
@@ -102,12 +115,35 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
     localStorage.setItem(key, JSON.stringify(updatedMessages));
   };
 
+  const fetchAllStudents = async () => {
+    try {
+      const response = await fetch(`${MAIN_SERVER_URL}/students`);
+      const data = await response.json();
+
+      console.log("Students:", JSON.stringify(data, null, 2));
+
+      // TODO: Implement pagination
+      setStudents(data);
+
+      localStorage.setItem("students", JSON.stringify(data));
+
+      const studentNames = data.map(
+        (student: Student) => student.preferredname
+      );
+      return studentNames.filter((name: string) => name !== info.preferredName);
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
+  };
+
   const values = {
     chats,
     fetchChats,
     messages,
     fetchMessages,
     sendMessage,
+    students,
+    fetchAllStudents,
   };
 
   return <ChatContext.Provider value={values}>{children}</ChatContext.Provider>;

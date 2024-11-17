@@ -1,9 +1,17 @@
 import React, { FC, useEffect, useState, useMemo } from "react";
 import { useIntl } from "react-intl";
 import {
-  Avatar,
+  Autocomplete,
+  // Avatar,
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
+  Fab,
   Grid,
   Grid2,
   IconButton,
@@ -12,12 +20,20 @@ import {
   ListItemText,
   Paper,
   TextField,
+  Tooltip,
 } from "@mui/material";
-import { AttachFileTwoTone, SendTwoTone } from "@mui/icons-material";
+import {
+  AddCircle,
+  AttachFileTwoTone,
+  FindInPage,
+  Send,
+  SendTwoTone,
+} from "@mui/icons-material";
 
 import { useChatContext, Chat, ChatMessage } from "../../context/chatContext";
 import { useStudentContext } from "../../context/studentContext";
 import { useThemeContext } from "../../context/themeContext";
+import CircularLoading from "../loading/circular";
 import Layout from "../layout/layout";
 import Text from "../text/text";
 
@@ -30,6 +46,7 @@ interface ChatListProps {
   primaryColor: string;
   backgroundColor: string;
   borderColor: string;
+  handleStartNewChat: () => void;
 }
 
 const ChatList: FC<ChatListProps> = ({
@@ -41,6 +58,7 @@ const ChatList: FC<ChatListProps> = ({
   primaryColor,
   backgroundColor,
   borderColor,
+  handleStartNewChat,
 }) => {
   return (
     <Box
@@ -48,8 +66,8 @@ const ChatList: FC<ChatListProps> = ({
         pt: 1,
         pb: 1,
         position: "relative",
-        height: "77vh",
-        maxHeight: "77vh",
+        height: "80vh",
+        maxHeight: "80vh",
       }}
     >
       <Box
@@ -115,6 +133,30 @@ const ChatList: FC<ChatListProps> = ({
           })}
         </List>
       </Box>
+      <Box
+        sx={{
+          p: 2,
+          display: "flex",
+          alignItems: "center",
+          alignContent: "center",
+          justifyContent: "space-evenly",
+          border: "1px solid #ddd",
+          borderBottomLeftRadius: "6px",
+          borderBottomRightRadius: "6px",
+          backgroundColor: "#b7b7b7",
+        }}
+      >
+        <Tooltip title="Search chats" placement="top" arrow>
+          <IconButton color="secondary">
+            <FindInPage />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Create new chat" placement="top" arrow>
+          <IconButton color="secondary" onClick={handleStartNewChat}>
+            <AddCircle />
+          </IconButton>
+        </Tooltip>
+      </Box>
     </Box>
   );
 };
@@ -152,7 +194,7 @@ const ChatWindow: FC<ChatWindowProps> = ({
         sx={{
           flex: 1,
           p: 2,
-          height: "72vh",
+          height: "78vh",
           overflowY: "auto",
           width: "100%",
           backgroundColor: "#f7f7f7",
@@ -216,6 +258,7 @@ const ChatWindow: FC<ChatWindowProps> = ({
         <IconButton
           disabled={!Boolean(selectedChat)}
           onClick={handleClickAttach}
+          color="secondary"
         >
           <AttachFileTwoTone />
         </IconButton>
@@ -236,7 +279,7 @@ const ChatWindow: FC<ChatWindowProps> = ({
           onClick={() => handleClickSend(name, toID)}
           color="secondary"
         >
-          <SendTwoTone />
+          <Send />
         </IconButton>
       </Box>
     </Box>
@@ -253,11 +296,18 @@ const Chat: FC = () => {
     messages: _messages,
     fetchMessages,
     sendMessage,
+    students,
+    fetchAllStudents,
   } = useChatContext();
   const chats = useMemo(() => _chats, [_chats]);
   const messages = useMemo(() => _messages, [_messages]);
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [textMessage, setTextMessage] = useState<string>("");
+  const [isStartNewChatOpen, setIsStartNewChatOpen] = useState<boolean>(false);
+  const [isStartNewChatAutocompleteOpen, setIsStartNewChatAutocompleteOpen] =
+    useState<boolean>(false);
+  const [studentsAreLoading, setStudentsAreLoading] = useState<boolean>(false);
+  const [allStudents, setAllStudents] = useState<string[]>([]);
 
   const handleChatSelect = (chatID: string) => {
     setSelectedChat(chatID);
@@ -309,6 +359,27 @@ const Chat: FC = () => {
     setTextMessage("");
   };
 
+  const handleOpenStartNewChat = () => setIsStartNewChatOpen(true);
+  const handleCloseStartNewChat = () => setIsStartNewChatOpen(false);
+
+  const handleOpenStartNewChatAutocomplete = async () => {
+    // setAllStudents(["Alina", "Koala", "Koalita"]);
+    setIsStartNewChatAutocompleteOpen(true);
+    try {
+      setStudentsAreLoading(true);
+      const fetchedStudents = await fetchAllStudents();
+      setAllStudents(fetchedStudents);
+      setStudentsAreLoading(false);
+    } catch (error) {
+      console.error("Error fetching students: ", error);
+      setStudentsAreLoading(false);
+    }
+  };
+  const handleCloseStartNewChatAutocomplete = () => {
+    setIsStartNewChatAutocompleteOpen(false);
+    setAllStudents([]);
+  };
+
   useEffect(() => {
     const storedStudentInfo = getInfo();
 
@@ -329,13 +400,7 @@ const Chat: FC = () => {
 
   return (
     <Layout title={intl.formatMessage({ id: "common_chat" })}>
-      <Text variant="h4" fontFamily={heavyFont}>
-        {intl.formatMessage({ id: "common_chat" })}
-      </Text>
-      <Text variant="body1" fontFamily={regularFont}>
-        {intl.formatMessage({ id: "chat_description" })}
-      </Text>
-      <Grid container sx={{ height: "77vh" }}>
+      <Grid container sx={{ height: "84vh" }}>
         <Grid item xs={4} md={3}>
           <ChatList
             chats={chats}
@@ -346,6 +411,7 @@ const Chat: FC = () => {
             primaryColor={theme.palette.primary.light}
             backgroundColor={themeCustom.palette.background.main}
             borderColor={themeCustom.palette.background.border}
+            handleStartNewChat={handleOpenStartNewChat}
           />
         </Grid>
         <Grid item xs={8} md={9}>
@@ -364,6 +430,61 @@ const Chat: FC = () => {
           />
         </Grid>
       </Grid>
+      <Dialog open={isStartNewChatOpen} onClose={handleCloseStartNewChat}>
+        <DialogTitle>
+          <Text variant="h6" fontFamily={heavyFont}>
+            Start a new chat
+          </Text>
+        </DialogTitle>
+        <Divider />
+        <DialogContent sx={{ minWidth: 450 }}>
+          <DialogContentText>
+            <Text variant="body1" fontFamily={regularFont} fontWeight="bold">
+              Select a user to start a new chat with:
+            </Text>
+          </DialogContentText>
+          <Autocomplete
+            sx={{ minWidth: 300 }}
+            open={isStartNewChatAutocompleteOpen}
+            onOpen={handleOpenStartNewChatAutocomplete}
+            onClose={handleCloseStartNewChatAutocomplete}
+            isOptionEqualToValue={(option, value) => option === value}
+            getOptionLabel={(option: string) => option}
+            options={allStudents}
+            loading={studentsAreLoading}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search for a user..."
+                variant="outlined"
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {studentsAreLoading ? <CircularLoading /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  },
+                }}
+              />
+            )}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseStartNewChat} variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleCloseStartNewChat}
+            variant="contained"
+            color="primary"
+          >
+            Start chat
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Layout>
   );
 };

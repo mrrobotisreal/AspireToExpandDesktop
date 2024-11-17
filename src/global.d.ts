@@ -17,6 +17,7 @@ export interface ElectronAPI {
     time: number;
   }) => void;
   onNewMessage: (callback: (message: any) => void) => void;
+  selectChatAttachment: () => Promise<string>;
 }
 
 declare global {

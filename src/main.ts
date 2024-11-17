@@ -108,6 +108,25 @@ function createWindow(): void {
       return result.filePaths[0];
     }
   });
+  ipcMain.handle("select-chat-attachment", async () => {
+    const result = await dialog.showOpenDialog(mainWindow!, {
+      properties: ["openFile"],
+      filters: [
+        {
+          name: "All Files",
+          extensions: ["*"],
+        },
+      ],
+    });
+
+    // @ts-ignore
+    if (result.canceled) {
+      return null;
+    } else {
+      // @ts-ignore
+      return result.filePaths[0];
+    }
+  });
 }
 
 app.whenReady().then(() => createWindow());
