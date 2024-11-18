@@ -17,29 +17,76 @@ interface ThemeCustom {
     primary: { main: string; dark?: string; light?: string };
     secondary: { main: string; dark?: string; light?: string };
     background: { main: string; border: string };
+    border: { main: string; dark?: string; light?: string };
   };
 }
 
+// const lightTheme = createTheme({
+//   palette: {
+//     mode: "light",
+//     primary: { main: "#007bff", light: "#8dd0ff" },
+//     secondary: { main: "#edff00", dark: "#ff8600" },
+//   },
+// });
+
+// const lightThemeCustom: ThemeCustom = {
+//   palette: {
+//     mode: "light",
+//     primary: { main: "#007bff", light: "#8dd0ff" },
+//     secondary: { main: "#edff00", dark: "#ff8600" },
+//     background: { main: "#f7f7f7", border: "#ddd" },
+//   },
+// };
+
+/**
+ * Option 1 light theme
+ */
 const lightTheme = createTheme({
   palette: {
     mode: "light",
-    primary: { main: "#007bff", light: "#8dd0ff" },
-    secondary: { main: "#edff00", dark: "#ff8600" },
+    common: { black: "#000", white: "#fff" },
+    primary: { main: "#2ec4b6", light: "#cbf3f0", dark: "#006D77" },
+    // secondary: { main: "#ff9f1c", light: "#ffbf69", dark: "#78290f" },
+    secondary: { main: "#ff9f1c", light: "#fad621", dark: "#78290f" },
+    text: { primary: "#001524", secondary: "#264653" },
+    background: { default: "#fff", paper: "#f7f7f7" },
   },
 });
 
 const lightThemeCustom: ThemeCustom = {
   palette: {
     mode: "light",
-    primary: { main: "#007bff", light: "#8dd0ff" },
-    secondary: { main: "#edff00", dark: "#ff8600" },
+    primary: { main: "#2ec4b6", light: "#cbf3f0", dark: "#006D77" },
+    secondary: { main: "#ff9f1c", light: "#fad621", dark: "#78290f" },
     background: { main: "#f7f7f7", border: "#ddd" },
+    border: { main: "#ddd", light: "#f7f7f7", dark: "#333" },
   },
 };
 
+// const darkTheme = createTheme({
+//   palette: {
+//     mode: "dark",
+//     primary: { main: "#bb86fc", dark: "#3700b3" },
+//     secondary: { main: "#03dac6", dark: "#00796B" },
+//   },
+// });
+
+// const darkThemeCustom: ThemeCustom = {
+//   palette: {
+//     mode: "dark",
+//     primary: { main: "#bb86fc", dark: "#3700b3" },
+//     secondary: { main: "#03dac6", dark: "#00796B" },
+//     background: { main: "#121212", border: "#333" },
+//   },
+// };
+
+/**
+ * Option 1 dark theme
+ */
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
+    common: { black: "#000", white: "#fff" },
     primary: { main: "#bb86fc", dark: "#3700b3" },
     secondary: { main: "#03dac6", dark: "#00796B" },
   },
@@ -51,6 +98,7 @@ const darkThemeCustom: ThemeCustom = {
     primary: { main: "#bb86fc", dark: "#3700b3" },
     secondary: { main: "#03dac6", dark: "#00796B" },
     background: { main: "#121212", border: "#333" },
+    border: { main: "#333", light: "#121212", dark: "#f7f7f7" },
   },
 };
 

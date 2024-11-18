@@ -9,7 +9,7 @@ import Text from "../text/text";
 const Home: FC = () => {
   const intl = useIntl();
   const { info, getInfo, updateInfo } = useStudentContext();
-  const { regularFont, heavyFont } = useThemeContext();
+  const { theme, regularFont, heavyFont } = useThemeContext();
   const { firstName } = info;
 
   useEffect(() => {
@@ -24,10 +24,10 @@ const Home: FC = () => {
 
   return (
     <Layout title={intl.formatMessage({ id: "common_home" })}>
-      <Text variant="h4" fontFamily={heavyFont}>
+      <Text variant="h4" fontFamily={heavyFont} color="textPrimary">
         {intl.formatMessage({ id: "common_welcome" }, { firstName })}
       </Text>
-      <Text variant="body1" fontFamily={regularFont}>
+      <Text variant="body1" fontFamily={regularFont} color="textPrimary">
         {intl.formatMessage({ id: "home_description" })}
       </Text>
     </Layout>

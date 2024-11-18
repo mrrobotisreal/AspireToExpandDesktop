@@ -27,7 +27,7 @@ import Text from "../text/text";
 const Classroom: FC = () => {
   const intl = useIntl();
   const { info, getInfo, updateInfo } = useStudentContext();
-  const { regularFont, heavyFont } = useThemeContext();
+  const { theme, themeCustom, regularFont, heavyFont } = useThemeContext();
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const peerConnection = useRef<RTCPeerConnection>(
@@ -192,8 +192,8 @@ const Classroom: FC = () => {
             width: "100%",
             border: "1px solid black",
             borderRadius: "6px",
-            backgroundColor: "darkgray",
-            backgroundImage: `url("${__dirname}/src/assets/images/backgroundVideoImage.png")`,
+            backgroundImage:
+              "linear-gradient(to left top,#78290f,#ff7d00,#ffbf69,#cbf3f0,#2ec4b6,#006d77,#001524)",
           }}
         />
       </Tooltip>
@@ -207,8 +207,8 @@ const Classroom: FC = () => {
             width: "100%",
             border: "1px solid black",
             borderRadius: "6px",
-            backgroundColor: "darkgray",
-            backgroundImage: `url("${__dirname}/src/assets/images/backgroundVideoImage.png")`,
+            backgroundImage:
+              "linear-gradient(to left top,#78290f,#ff7d00,#ffbf69,#cbf3f0,#2ec4b6,#006d77,#001524)",
           }}
         />
       </Tooltip>
@@ -219,7 +219,10 @@ const Classroom: FC = () => {
             onClick={handleOpenCallSettingsMenu}
             size="large"
           >
-            <SettingsTwoTone fontSize="large" />
+            <SettingsTwoTone
+              fontSize="large"
+              sx={{ color: theme.palette.secondary.light }}
+            />
           </IconButton>
           <Menu
             id="call-settings-menu"
@@ -237,16 +240,25 @@ const Classroom: FC = () => {
             onClose={handleCloseCallSettingsMenu}
           >
             <Box padding={2}>
-              <Text variant="h6" fontFamily={heavyFont}>
+              <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
                 Call settings
               </Text>
               <Divider sx={{ my: 0.5 }} />
-              <Text variant="body1" fontFamily={regularFont} fontWeight="bold">
+              <Text
+                variant="body1"
+                fontFamily={regularFont}
+                fontWeight="bold"
+                color="textPrimary"
+              >
                 Video
               </Text>
               {videoDevices.map((device) => (
                 <MenuItem key={device.label}>
-                  <Text variant="body2" fontFamily={regularFont}>
+                  <Text
+                    variant="body2"
+                    fontFamily={regularFont}
+                    color="textPrimary"
+                  >
                     {device.label === selectedVideoDevice
                       ? `✅ ${device.label}`
                       : device.label}
@@ -254,12 +266,21 @@ const Classroom: FC = () => {
                 </MenuItem>
               ))}
               <Divider sx={{ my: 0.5 }} />
-              <Text variant="body1" fontFamily={regularFont} fontWeight="bold">
+              <Text
+                variant="body1"
+                fontFamily={regularFont}
+                fontWeight="bold"
+                color="textPrimary"
+              >
                 Audio
               </Text>
               {audioDevices.map((device) => (
                 <MenuItem key={device.label}>
-                  <Text variant="body2" fontFamily={regularFont}>
+                  <Text
+                    variant="body2"
+                    fontFamily={regularFont}
+                    color="textPrimary"
+                  >
                     {device.label === selectedAudioDevice
                       ? `✅ ${device.label}`
                       : device.label}
@@ -271,23 +292,33 @@ const Classroom: FC = () => {
           <Tooltip title={selectedAudioDevice} placement="top" arrow>
             <IconButton size="large" onClick={toggleAudio}>
               {isMicOn ? (
-                <MicTwoTone fontSize="large" />
+                <MicTwoTone
+                  fontSize="large"
+                  sx={{ color: theme.palette.secondary.light }}
+                />
               ) : (
-                <MicOffTwoTone fontSize="large" />
+                <MicOffTwoTone fontSize="large" color="disabled" />
               )}
             </IconButton>
           </Tooltip>
           <Tooltip title={selectedVideoDevice} placement="top" arrow>
             <IconButton size="large" onClick={toggleVideo}>
               {isVideoOn ? (
-                <VideocamTwoTone fontSize="large" />
+                <VideocamTwoTone
+                  fontSize="large"
+                  sx={{ color: theme.palette.secondary.light }}
+                />
               ) : (
-                <VideocamOffTwoTone fontSize="large" />
+                <VideocamOffTwoTone fontSize="large" color="disabled" />
               )}
             </IconButton>
           </Tooltip>
-          <Button variant="contained" onClick={createOffer}>
-            <Text variant="button" fontFamily={regularFont}>
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: theme.palette.secondary.light }}
+            onClick={createOffer}
+          >
+            <Text variant="button" fontFamily={regularFont} color="textPrimary">
               Join class
             </Text>
           </Button>

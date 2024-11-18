@@ -42,7 +42,7 @@ const StudentInfoForm: FC = () => {
   const intl = useIntl();
   const { state } = useLocation();
   const { firstName, lastName, email } = state;
-  const { regularFont, heavyFont } = useThemeContext();
+  const { theme, regularFont, heavyFont } = useThemeContext();
   const [nativeLanguage, setNativeLanguage] = useState("uk");
   const [preferredLanguage, setPreferredLanguage] = useState("en");
   const [enteredFirstName, setEnteredFirstName] = useState(firstName);
@@ -211,15 +211,20 @@ const StudentInfoForm: FC = () => {
 
   return (
     <Layout title={intl.formatMessage({ id: "studentInfoForm_title" })}>
-      <Text variant="h4" fontFamily={heavyFont}>
+      <Text variant="h4" fontFamily={heavyFont} color="textPrimary">
         {intl.formatMessage({ id: "common_welcome" }, { firstName })}
       </Text>
-      <Text variant="body1" fontFamily={regularFont}>
+      <Text variant="body1" fontFamily={regularFont} color="textPrimary">
         {intl.formatMessage({ id: "studentInfoForm_description" })}
       </Text>
       <br />
       <br />
-      <Text variant="h6" fontWeight="bold" fontFamily={heavyFont}>
+      <Text
+        variant="h6"
+        fontWeight="bold"
+        fontFamily={heavyFont}
+        color="textPrimary"
+      >
         {intl.formatMessage({ id: "studentInfoForm_nativeLanguageLabel" })}:
       </Text>
       <FormControl sx={{ maxWidth: 375 }}>
@@ -229,23 +234,23 @@ const StudentInfoForm: FC = () => {
           onChange={handleSelectNativeLanguage}
         >
           <MenuItem value="uk">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_uk" })}
             </Text>
           </MenuItem>
           <MenuItem value="ru">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_ru" })}
             </Text>
           </MenuItem>
           <MenuItem value="de">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_de" })}
             </Text>
           </MenuItem>
         </Select>
         <FormHelperText>
-          <Text variant="caption" fontFamily={regularFont}>
+          <Text variant="caption" fontFamily={regularFont} color="textPrimary">
             {intl.formatMessage({
               id: "studentInfoForm_nativeLanguageHelperText",
             })}
@@ -254,7 +259,12 @@ const StudentInfoForm: FC = () => {
       </FormControl>
       <br />
       <br />
-      <Text variant="h6" fontWeight="bold" fontFamily={heavyFont}>
+      <Text
+        variant="h6"
+        fontWeight="bold"
+        fontFamily={heavyFont}
+        color="textPrimary"
+      >
         {intl.formatMessage({ id: "studentInfoForm_preferredLanguageLabel" })}:
       </Text>
       <FormControl sx={{ maxWidth: 375 }}>
@@ -264,28 +274,28 @@ const StudentInfoForm: FC = () => {
           onChange={handleSelectPreferredLanguage}
         >
           <MenuItem value="en">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_en" })}
             </Text>
           </MenuItem>
           <MenuItem value="uk">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_uk" })}
             </Text>
           </MenuItem>
           <MenuItem value="ru">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_ru" })}
             </Text>
           </MenuItem>
           <MenuItem value="de">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_de" })}
             </Text>
           </MenuItem>
         </Select>
         <FormHelperText>
-          <Text variant="caption" fontFamily={regularFont}>
+          <Text variant="caption" fontFamily={regularFont} color="textPrimary">
             {intl.formatMessage({
               id: "studentInfoForm_preferredLanguageHelperText",
             })}
@@ -294,7 +304,7 @@ const StudentInfoForm: FC = () => {
       </FormControl>
       <br />
       <br />
-      <Text variant="h6" fontFamily={heavyFont}>
+      <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
         {intl.formatMessage({ id: "studentInfoForm_inputFirstName" })}:
       </Text>
       <FormControl sx={{ minWidth: 375 }}>
@@ -302,7 +312,7 @@ const StudentInfoForm: FC = () => {
           fullWidth
           variant="outlined"
           label={
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_firstName" })}
             </Text>
           }
@@ -313,7 +323,7 @@ const StudentInfoForm: FC = () => {
       </FormControl>
       <br />
       <br />
-      <Text variant="h6" fontFamily={heavyFont}>
+      <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
         {intl.formatMessage({ id: "studentInfoForm_inputPreferredName" })}:
       </Text>
       <FormControl sx={{ minWidth: 375 }}>
@@ -321,7 +331,7 @@ const StudentInfoForm: FC = () => {
           fullWidth
           variant="outlined"
           label={
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_preferredName" })}
             </Text>
           }
@@ -329,7 +339,11 @@ const StudentInfoForm: FC = () => {
           value={enteredPreferredName}
           onChange={handlePreferredName}
           helperText={
-            <Text variant="caption" fontFamily={regularFont}>
+            <Text
+              variant="caption"
+              fontFamily={regularFont}
+              color="textPrimary"
+            >
               {intl.formatMessage({
                 id: "studentInfoForm_inputPreferredNameHelperText",
               })}
@@ -339,7 +353,7 @@ const StudentInfoForm: FC = () => {
       </FormControl>
       <br />
       <br />
-      <Text variant="h6" fontFamily={heavyFont}>
+      <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
         {intl.formatMessage({ id: "studentInfoForm_inputLastName" })}:
       </Text>
       <FormControl sx={{ minWidth: 375 }}>
@@ -347,7 +361,7 @@ const StudentInfoForm: FC = () => {
           fullWidth
           variant="outlined"
           label={
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_lastName" })}
             </Text>
           }
@@ -358,7 +372,7 @@ const StudentInfoForm: FC = () => {
       </FormControl>
       <br />
       <br />
-      <Text variant="h6" fontFamily={heavyFont}>
+      <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
         {intl.formatMessage({ id: "studentInfoForm_emailInputLabel" })}:
       </Text>
       <FormControl sx={{ minWidth: 375 }}>
@@ -366,7 +380,7 @@ const StudentInfoForm: FC = () => {
           fullWidth
           variant="outlined"
           label={
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({
                 id: isEmailAddressValid
                   ? "common_emailAddress"
@@ -393,7 +407,7 @@ const StudentInfoForm: FC = () => {
       </FormControl>
       <br />
       <br />
-      <Text variant="h6" fontFamily={heavyFont}>
+      <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
         {intl.formatMessage({ id: "studentInfoForm_passwordInputLabel" })}:
       </Text>
       <FormControl sx={{ minWidth: 375 }}>
@@ -401,7 +415,7 @@ const StudentInfoForm: FC = () => {
           fullWidth
           variant="outlined"
           label={
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({
                 id: isPasswordValid
                   ? "common_passwordTitle"
@@ -433,7 +447,7 @@ const StudentInfoForm: FC = () => {
       <Box display="flex" justifyContent="flex-end">
         <Button
           variant="contained"
-          color="primary"
+          sx={{ backgroundColor: theme.palette.secondary.light }}
           onClick={handleConfirmInfoDialogOpen}
           disabled={
             !nativeLanguage ||
@@ -447,7 +461,7 @@ const StudentInfoForm: FC = () => {
             !password
           }
         >
-          <Text variant="button" fontFamily={regularFont}>
+          <Text variant="button" fontFamily={regularFont} color="textPrimary">
             {intl.formatMessage({ id: "common_submit" })}
           </Text>
         </Button>
@@ -458,20 +472,20 @@ const StudentInfoForm: FC = () => {
         TransitionComponent={Transition}
         keepMounted
       >
-        <DialogTitle>
-          <Text variant="h5" fontFamily={heavyFont}>
+        <DialogTitle sx={{ backgroundColor: theme.palette.primary.main }}>
+          <Text variant="h5" fontFamily={heavyFont} color="textPrimary">
             {intl.formatMessage({ id: "studentInfoForm_confirmInfoTitle" })}
           </Text>
           <Divider />
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            <Text variant="h6" fontFamily={heavyFont}>
+            <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
               {intl.formatMessage({ id: "common_nativeLanguage" })}:
             </Text>
           </DialogContentText>
           <DialogContentText>
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({
                 id: `common_language_${nativeLanguage}`,
               })}
@@ -479,12 +493,12 @@ const StudentInfoForm: FC = () => {
           </DialogContentText>
           <br />
           <DialogContentText>
-            <Text variant="h6" fontFamily={heavyFont}>
+            <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
               {intl.formatMessage({ id: "common_preferredLanguage" })}:
             </Text>
           </DialogContentText>
           <DialogContentText>
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({
                 id: `common_language_${preferredLanguage}`,
               })}
@@ -492,45 +506,45 @@ const StudentInfoForm: FC = () => {
           </DialogContentText>
           <br />
           <DialogContentText>
-            <Text variant="h6" fontFamily={heavyFont}>
+            <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
               {intl.formatMessage({ id: "common_firstName" })}:
             </Text>
           </DialogContentText>
           <DialogContentText>
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {enteredFirstName}
             </Text>
           </DialogContentText>
           <br />
           <DialogContentText>
-            <Text variant="h6" fontFamily={heavyFont}>
+            <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
               {intl.formatMessage({ id: "common_preferredName" })}:
             </Text>
           </DialogContentText>
           <DialogContentText>
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {enteredPreferredName}
             </Text>
           </DialogContentText>
           <br />
           <DialogContentText>
-            <Text variant="h6" fontFamily={heavyFont}>
+            <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
               {intl.formatMessage({ id: "common_lastName" })}:
             </Text>
           </DialogContentText>
           <DialogContentText>
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {enteredLastName}
             </Text>
           </DialogContentText>
           <br />
           <DialogContentText>
-            <Text variant="h6" fontFamily={heavyFont}>
+            <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
               {intl.formatMessage({ id: "common_emailAddress" })}:
             </Text>
           </DialogContentText>
           <DialogContentText>
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {emailAddress}
             </Text>
           </DialogContentText>
@@ -539,19 +553,23 @@ const StudentInfoForm: FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleConfirmInfoDialogClose} color="secondary">
-            <Text variant="button" fontFamily={regularFont}>
+            <Text variant="button" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_cancel" })}
             </Text>
           </Button>
           <Button
             onClick={() => handleSubmitInfo()}
-            color="primary"
+            sx={{ backgroundColor: theme.palette.secondary.light }}
             variant="contained"
           >
             {isLoading ? (
               <CircularLoading />
             ) : (
-              <Text variant="button" fontFamily={regularFont}>
+              <Text
+                variant="button"
+                fontFamily={regularFont}
+                color="textPrimary"
+              >
                 {intl.formatMessage({ id: "common_confirm" })}
               </Text>
             )}

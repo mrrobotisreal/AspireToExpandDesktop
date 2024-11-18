@@ -10,6 +10,14 @@ import { HTTP_CHAT_SERVER_URL, MAIN_SERVER_URL } from "../constants/urls";
 
 import { useStudentContext } from "./studentContext";
 
+function sleep(duration: number): Promise<void> {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, duration);
+  });
+}
+
 export interface ChatMessage {
   from: string;
   fromID: string;
@@ -41,21 +49,27 @@ export interface Student {
 
 interface ChatContextProps {
   chats: Chat[];
+  chatsAreLoading: boolean;
   fetchChats: (studentId: string) => void;
   messages: ChatMessage[];
+  messagesAreLoading: boolean;
   fetchMessages: (chatId: string) => void;
   sendMessage: (message: ChatMessage) => void;
   students: Student[];
+  studentsAreLoading: boolean;
   fetchAllStudents: () => Promise<string[]>;
 }
 
 const ChatContext = createContext<ChatContextProps>({
   chats: [],
+  chatsAreLoading: false,
   fetchChats: async (studentId: string) => {},
   messages: [],
+  messagesAreLoading: false,
   fetchMessages: async (chatId: string) => {},
   sendMessage: async (message: ChatMessage) => {},
   students: [],
+  studentsAreLoading: false,
   fetchAllStudents: async () => [],
 });
 
@@ -64,11 +78,15 @@ export const useChatContext = () => useContext<ChatContextProps>(ChatContext);
 const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const { info } = useStudentContext();
   const [chats, setChats] = useState<Chat[]>([]);
+  const [chatsAreLoading, setChatsAreLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messagesAreLoading, setMessagesAreLoading] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
+  const [studentsAreLoading, setStudentsAreLoading] = useState(false);
 
   const fetchChats = async (studentId: string) => {
     try {
+      setChatsAreLoading(true);
       const response = await fetch(
         `${HTTP_CHAT_SERVER_URL}/chats?studentID=${studentId}`
       );
@@ -82,14 +100,18 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
       setChats(sortedData);
 
       localStorage.setItem("chats", JSON.stringify(sortedData));
+      await sleep(1500);
+      setChatsAreLoading(false);
     } catch (error) {
       console.error("Error fetching chats:", error);
+      setChatsAreLoading(false);
     }
   };
 
   const fetchMessages = async (chatId: string, page = 1) => {
     // TODO: Implement pagination
     try {
+      setMessagesAreLoading(true);
       const response = await fetch(
         `${HTTP_CHAT_SERVER_URL}/messages?chatID=${chatId}&limit=50&page=${page}`
       );
@@ -100,8 +122,11 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
       // TODO: Implement pagination and syncing with the server
       const key = `messages_${chatId}_${page}`;
       localStorage.setItem(key, JSON.stringify(data));
+      await sleep(1500);
+      setMessagesAreLoading(false);
     } catch (error) {
       console.error("Error fetching messages:", error);
+      setMessagesAreLoading(false);
     }
   };
 
@@ -117,6 +142,7 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const fetchAllStudents = async () => {
     try {
+      setStudentsAreLoading(true);
       const response = await fetch(`${MAIN_SERVER_URL}/students`);
       const data = await response.json();
 
@@ -130,19 +156,29 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
       const studentNames = data.map(
         (student: Student) => student.preferredname
       );
-      return studentNames.filter((name: string) => name !== info.preferredName);
+      const filteredStudentNames = studentNames.filter(
+        (name: string) => name !== info.preferredName
+      );
+      await sleep(1500);
+      setStudentsAreLoading(false);
+
+      return filteredStudentNames;
     } catch (error) {
       console.error("Error fetching students:", error);
+      setStudentsAreLoading(false);
     }
   };
 
   const values = {
     chats,
+    chatsAreLoading,
     fetchChats,
     messages,
+    messagesAreLoading,
     fetchMessages,
     sendMessage,
     students,
+    studentsAreLoading,
     fetchAllStudents,
   };
 

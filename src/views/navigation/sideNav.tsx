@@ -50,73 +50,73 @@ const SIDE_NAV_ITEMS: SideNavItem[] = [
   {
     id: "menu_home",
     path: "/home",
-    icon: <HomeTwoTone />,
+    icon: <HomeTwoTone color="secondary" />,
   },
   {
     id: "menu_chat",
     path: "/chat",
-    icon: <ChatTwoTone />,
+    icon: <ChatTwoTone color="secondary" />,
   },
   {
     id: "menu_classroom",
     path: "/classroom",
-    icon: <VideocamTwoTone />,
+    icon: <VideocamTwoTone color="secondary" />,
   },
   {
     id: "menu_lessons",
     path: "/lessons",
-    icon: <SchoolTwoTone />,
+    icon: <SchoolTwoTone color="secondary" />,
   },
   {
     id: "menu_assignments",
-    icon: <AssignmentTwoTone />,
+    icon: <AssignmentTwoTone color="secondary" />,
     children: [
       {
         id: "menu_assignments_allAssignments",
         path: "/assignments",
-        icon: <AssignmentTwoTone />,
+        icon: <AssignmentTwoTone color="secondary" />,
       },
       {
         id: "menu_assignments_completedAssignments",
         path: "/assignments/completed",
-        icon: <AssignmentTurnedInTwoTone />,
+        icon: <AssignmentTurnedInTwoTone color="secondary" />,
       },
       {
         id: "menu_assignments_currentAssignments",
         path: "/assignments/current",
-        icon: <AssignmentLateTwoTone />,
+        icon: <AssignmentLateTwoTone color="secondary" />,
       },
     ],
   },
   {
     id: "menu_games",
-    icon: <GamesTwoTone />,
+    icon: <GamesTwoTone color="secondary" />,
     children: [
       {
         id: "menu_games_allGames",
         path: "/games",
-        icon: <GamesTwoTone />,
+        icon: <GamesTwoTone color="secondary" />,
       },
       {
         id: "menu_games_spaceShooter",
         path: "/games/space-shooter",
-        icon: <RocketLaunchTwoTone />,
+        icon: <RocketLaunchTwoTone color="secondary" />,
       },
     ],
   },
   {
     id: "menu_settings",
-    icon: <SettingsTwoTone />,
+    icon: <SettingsTwoTone color="secondary" />,
     children: [
       {
         id: "menu_settings_appSettings",
         path: "/settings",
-        icon: <SettingsTwoTone />,
+        icon: <SettingsTwoTone color="secondary" />,
       },
       {
         id: "menu_settings_profileSettings",
         path: "/profile",
-        icon: <AccountCircleTwoTone />,
+        icon: <AccountCircleTwoTone color="secondary" />,
       },
     ],
   },
@@ -250,7 +250,7 @@ const SideNav: FC<SideNavProps> = ({
             }}
           >
             <ListItemIcon>
-              <LogoutTwoTone />
+              <LogoutTwoTone color="secondary" />
             </ListItemIcon>
             <ListItemText>
               <Text variant="body1" fontFamily={regularFont}>

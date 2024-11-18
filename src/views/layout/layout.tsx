@@ -1,6 +1,7 @@
 import React, { FC, useState } from "react";
 import { Box, Container, CssBaseline, Toolbar } from "@mui/material";
 
+import { useThemeContext } from "../../context/themeContext";
 import TopNav from "../navigation/topNav";
 import SideNav from "../navigation/sideNav";
 
@@ -10,6 +11,7 @@ interface LayoutProps {
 }
 
 const Layout: FC<LayoutProps> = ({ children, title }) => {
+  const { theme } = useThemeContext();
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
 
   const handleDrawerOpen = () => setDrawerIsOpen(true);
@@ -36,7 +38,7 @@ const Layout: FC<LayoutProps> = ({ children, title }) => {
           flexGrow: 1,
           width: "100%",
           paddingTop: "64px",
-          bgcolor: "background.default",
+          bgcolor: theme.palette.common.white,
           position: "relative",
         }}
       >

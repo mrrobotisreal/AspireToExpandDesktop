@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -19,9 +19,15 @@ import Toast from "../alerts/toast";
 
 const Settings: FC = () => {
   const intl = useIntl();
-  const { toggleThemeMode, changeFontStyle, heavyFont, regularFont } =
-    useThemeContext();
-  const { info, updateInfo, updateInfoOnServer } = useStudentContext();
+  const {
+    theme,
+    themeCustom,
+    toggleThemeMode,
+    changeFontStyle,
+    heavyFont,
+    regularFont,
+  } = useThemeContext();
+  const { info, getInfo, updateInfo, updateInfoOnServer } = useStudentContext();
   const [selectedThemeMode, setSelectedThemeMode] = useState<ThemeMode>(
     info.themeMode ?? "light"
   );
@@ -49,7 +55,7 @@ const Settings: FC = () => {
 
   const handleUpdateSettingsOnServer = async () => {
     if (!info.emailAddress || info.emailAddress === "") {
-      console.error("Email address is required to update settings on server");
+      console.error("Email address is required to update settings on server"); // TODO: localize
       return;
     }
 
@@ -60,7 +66,7 @@ const Settings: FC = () => {
         font_style: selectedFontFamily,
       });
     } catch (error) {
-      console.error("Error updating settings on server: ", error);
+      console.error("Error updating settings on server: ", error); // TODO: localize
     }
   };
 
@@ -85,17 +91,32 @@ const Settings: FC = () => {
     setToastIsOpen(false);
   };
 
+  useEffect(() => {
+    const storedStudentInfo = getInfo();
+
+    // TODO: Remove this useEffect in production;
+    // This is just for testing purposes to keep info updated during refreshes
+    if (storedStudentInfo) {
+      updateInfo(storedStudentInfo);
+    }
+  }, []);
+
   return (
     <Layout title={intl.formatMessage({ id: "common_settingsTitle" })}>
-      <Text variant="h4" fontFamily={heavyFont}>
+      <Text variant="h4" fontFamily={heavyFont} color="textPrimary">
         {intl.formatMessage({ id: "account_appSettings" })}
       </Text>
-      <Text variant="body1" fontFamily={regularFont}>
+      <Text variant="body1" fontFamily={regularFont} color="textPrimary">
         {intl.formatMessage({ id: "account_appSettings_description" })}
       </Text>
       <br />
       <br />
-      <Text variant="h6" fontWeight="bold" fontFamily={heavyFont}>
+      <Text
+        variant="h6"
+        fontWeight="bold"
+        fontFamily={heavyFont}
+        color="textPrimary"
+      >
         {intl.formatMessage({ id: "account_appSettings_themeMode" })}:
       </Text>
       <FormControl sx={{ minWidth: 300 }}>
@@ -105,14 +126,14 @@ const Settings: FC = () => {
           onChange={handleSelectThemeMode}
         >
           <MenuItem value="light">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({
                 id: "account_appSettings_themeMode_lightTheme",
               })}
             </Text>
           </MenuItem>
           <MenuItem value="dark">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({
                 id: "account_appSettings_themeMode_darkTheme",
               })}
@@ -122,7 +143,12 @@ const Settings: FC = () => {
       </FormControl>
       <br />
       <br />
-      <Text variant="h6" fontWeight="bold" fontFamily={heavyFont}>
+      <Text
+        variant="h6"
+        fontWeight="bold"
+        fontFamily={heavyFont}
+        color="textPrimary"
+      >
         {intl.formatMessage({ id: "account_appSettings_fontStyle" })}:
       </Text>
       <FormControl sx={{ minWidth: 300 }}>
@@ -132,49 +158,69 @@ const Settings: FC = () => {
           onChange={handleSelectFontStyle}
         >
           <MenuItem value="Bauhaus">
-            <Text variant="body1" fontFamily="Bauhaus-Medium">
+            <Text
+              variant="body1"
+              fontFamily="Bauhaus-Medium"
+              color="textPrimary"
+            >
               {intl.formatMessage({
                 id: "account_appSettings_fontStyle_bauhaus",
               })}
             </Text>
           </MenuItem>
           <MenuItem value="Hummingbird">
-            <Text variant="body1" fontFamily="Hummingbird">
+            <Text variant="body1" fontFamily="Hummingbird" color="textPrimary">
               {intl.formatMessage({
                 id: "account_appSettings_fontStyle_hummingbird",
               })}
             </Text>
           </MenuItem>
           <MenuItem value="LobsterTwo">
-            <Text variant="body1" fontFamily="LobsterTwo-Regular">
+            <Text
+              variant="body1"
+              fontFamily="LobsterTwo-Regular"
+              color="textPrimary"
+            >
               {intl.formatMessage({
                 id: "account_appSettings_fontStyle_lobsterTwo",
               })}
             </Text>
           </MenuItem>
           <MenuItem value="NexaScript">
-            <Text variant="body1" fontFamily="NexaScript-Light">
+            <Text
+              variant="body1"
+              fontFamily="NexaScript-Light"
+              color="textPrimary"
+            >
               {intl.formatMessage({
                 id: "account_appSettings_fontStyle_nexaScript",
               })}
             </Text>
           </MenuItem>
           <MenuItem value="NotoSerif">
-            <Text variant="body1" fontFamily="NotoSerif">
+            <Text variant="body1" fontFamily="NotoSerif" color="textPrimary">
               {intl.formatMessage({
                 id: "account_appSettings_fontStyle_notoSerif",
               })}
             </Text>
           </MenuItem>
           <MenuItem value="Roboto">
-            <Text variant="body1" fontFamily="Roboto-Regular">
+            <Text
+              variant="body1"
+              fontFamily="Roboto-Regular"
+              color="textPrimary"
+            >
               {intl.formatMessage({
                 id: "account_appSettings_fontStyle_roboto",
               })}
             </Text>
           </MenuItem>
           <MenuItem value="Ubuntu">
-            <Text variant="body1" fontFamily="Ubuntu-Regular">
+            <Text
+              variant="body1"
+              fontFamily="Ubuntu-Regular"
+              color="textPrimary"
+            >
               {intl.formatMessage({
                 id: "account_appSettings_fontStyle_ubuntu",
               })}
@@ -187,10 +233,10 @@ const Settings: FC = () => {
       <Box display="flex" justifyContent="flex-end">
         <Button
           variant="contained"
-          color="primary"
+          sx={{ backgroundColor: theme.palette.secondary.light }}
           onClick={handleUpdateSettings}
         >
-          <Text variant="body1" fontFamily={regularFont}>
+          <Text variant="body1" fontFamily={regularFont} color="textPrimary">
             {intl.formatMessage({ id: "common_settings_save" })}
           </Text>
         </Button>

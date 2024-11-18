@@ -31,7 +31,7 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
   const intl = useIntl();
   const navigate = useNavigate();
   const { info, removeInfo } = useStudentContext();
-  const { regularFont, heavyFont } = useThemeContext();
+  const { theme, regularFont, heavyFont } = useThemeContext();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -57,6 +57,7 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
           fontFamily={heavyFont}
           textAlign="center"
           sx={{ flexGrow: 1 }}
+          color="textPrimary"
         >
           {title}
         </Text>
@@ -89,9 +90,9 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
             }}
           >
             <ListItemIcon>
-              <AccountCircleIcon />
+              <AccountCircleIcon color="secondary" />
             </ListItemIcon>
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "account_profileSettings" })}
             </Text>
           </MenuItem>
@@ -105,9 +106,9 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
             }}
           >
             <ListItemIcon>
-              <SettingsIcon />
+              <SettingsIcon color="secondary" />
             </ListItemIcon>
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "account_appSettings" })}
             </Text>
           </MenuItem>
@@ -123,9 +124,9 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
             }}
           >
             <ListItemIcon>
-              <LogoutIcon />
+              <LogoutIcon color="secondary" />
             </ListItemIcon>
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_logout" })}
             </Text>
           </MenuItem>

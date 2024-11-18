@@ -16,6 +16,7 @@ const Login: FC = () => {
   const intl = useIntl();
   const navigate = useNavigate();
   const {
+    theme,
     toggleThemeMode,
     changeFontStyle,
     lightFont,
@@ -158,30 +159,50 @@ const Login: FC = () => {
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
         borderRadius: "12px",
         minWidth: 400,
+        backgroundColor: theme.palette.common.white,
       }}
     >
-      <Text variant="subtitle1" textAlign="center" fontFamily={regularFont}>
+      <Text
+        variant="subtitle1"
+        textAlign="center"
+        fontFamily={regularFont}
+        color="textPrimary"
+      >
         {intl.formatMessage({
           id: isLoginVisible
             ? "welcomeScreen_loginTitle"
             : "welcomeScreen_welcomeTitle",
         })}
       </Text>
-      <Text variant="h4" fontFamily={heavyFont} textAlign="center">
+      <Text
+        variant="h4"
+        fontFamily={heavyFont}
+        textAlign="center"
+        color="textPrimary"
+      >
         {intl.formatMessage({ id: "appTitle" })}!
       </Text>
       <br />
       {isLoginVisible ? (
         <Stack direction="column" alignContent="space-evenly" spacing={4}>
           <div>
-            <Text variant="body1" fontWeight="bold" fontFamily={regularFont}>
+            <Text
+              variant="body1"
+              fontWeight="bold"
+              fontFamily={regularFont}
+              color="textPrimary"
+            >
               {intl.formatMessage({ id: "welcomeScreen_inputEmail" })}:
             </Text>
             <TextField
               fullWidth
               variant="outlined"
               label={
-                <Text variant="body1" fontFamily={regularFont}>
+                <Text
+                  variant="body1"
+                  fontFamily={regularFont}
+                  color="textPrimary"
+                >
                   {intl.formatMessage({ id: "common_emailAddress" })}
                 </Text>
               }
@@ -189,17 +210,27 @@ const Login: FC = () => {
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 setEmailAddress(event.target.value)
               }
+              color="primary"
             />
           </div>
           <div>
-            <Text variant="body1" fontWeight="bold" fontFamily={regularFont}>
+            <Text
+              variant="body1"
+              fontWeight="bold"
+              fontFamily={regularFont}
+              color="textPrimary"
+            >
               {intl.formatMessage({ id: "welcomeScreen_inputPassword" })}:
             </Text>
             <TextField
               fullWidth
               variant="outlined"
               label={
-                <Text variant="body1" fontFamily={regularFont}>
+                <Text
+                  variant="body1"
+                  fontFamily={regularFont}
+                  color="textPrimary"
+                >
                   {intl.formatMessage({ id: "common_passwordTitle" })}
                 </Text>
               }
@@ -208,19 +239,29 @@ const Login: FC = () => {
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 setPassword(event.target.value)
               }
+              color="primary"
             />
           </div>
         </Stack>
       ) : (
         <>
-          <Text variant="body1" fontWeight="bold" fontFamily={regularFont}>
+          <Text
+            variant="body1"
+            fontWeight="bold"
+            fontFamily={regularFont}
+            color="textPrimary"
+          >
             {intl.formatMessage({ id: "registrationCodeInputLabel" })}:
           </Text>
           <TextField
             fullWidth
             variant="outlined"
             label={
-              <Text variant="body1" fontFamily={regularFont}>
+              <Text
+                variant="body1"
+                fontFamily={regularFont}
+                color="textPrimary"
+              >
                 {intl.formatMessage({ id: "registrationCodeInputHint" })}
               </Text>
             }
@@ -228,9 +269,14 @@ const Login: FC = () => {
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
               setRegistrationCode(event.target.value)
             }
+            color="primary"
           />
           <FormHelperText>
-            <Text variant="caption" fontFamily={lightFont}>
+            <Text
+              variant="caption"
+              fontFamily={lightFont}
+              color="textSecondary"
+            >
               {intl.formatMessage({ id: "registrationCodeInputHelperText" })}
             </Text>
           </FormHelperText>
@@ -241,6 +287,8 @@ const Login: FC = () => {
         <Button
           variant="text"
           onClick={() => setIsLoginVisible(!isLoginVisible)}
+          // color="primary"
+          sx={{ color: theme.palette.primary.dark }}
         >
           <Text variant="body2" fontFamily={regularFont}>
             {intl.formatMessage({

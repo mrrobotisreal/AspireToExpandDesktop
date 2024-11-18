@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import {
   Avatar,
   Box,
@@ -20,9 +20,9 @@ import Toast from "../alerts/toast";
 
 const ProfileSettings: FC = () => {
   const intl = useIntl();
-  const { info, updateInfo, updateInfoOnServer } = useStudentContext();
+  const { info, getInfo, updateInfo, updateInfoOnServer } = useStudentContext();
   const { changeLocale } = useMessagesContext();
-  const { regularFont, heavyFont } = useThemeContext();
+  const { theme, themeCustom, regularFont, heavyFont } = useThemeContext();
   const [profilePicturePath, setProfilePicturePath] = useState(
     info.profilePicturePath ?? ""
   );
@@ -98,17 +98,46 @@ const ProfileSettings: FC = () => {
     setToastIsOpen(false);
   };
 
+  useEffect(() => {
+    const storedStudentInfo = getInfo();
+
+    // TODO: Remove this useEffect in production;
+    // This is just for testing purposes to keep info updated during refreshes
+    if (storedStudentInfo) {
+      updateInfo(storedStudentInfo);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (info.profilePicturePath) {
+      setProfilePicturePath(info.profilePicturePath);
+    }
+
+    if (info.preferredLanguage) {
+      setPreferredLanguage(info.preferredLanguage);
+    }
+
+    if (info.timeZone) {
+      setTimeZone(info.timeZone);
+    }
+  }, [info]);
+
   return (
     <Layout title={intl.formatMessage({ id: "common_account" })}>
-      <Text variant="h4" fontFamily={heavyFont}>
+      <Text variant="h4" fontFamily={heavyFont} color="textPrimary">
         {intl.formatMessage({ id: "account_profileSettings" })}
       </Text>
-      <Text variant="body1" fontFamily={regularFont}>
+      <Text variant="body1" fontFamily={regularFont} color="textPrimary">
         {intl.formatMessage({ id: "account_profileSettings_description" })}
       </Text>
       <br />
       <br />
-      <Text variant="h6" fontWeight="bold" fontFamily={heavyFont}>
+      <Text
+        variant="h6"
+        fontWeight="bold"
+        fontFamily={heavyFont}
+        color="textPrimary"
+      >
         {intl.formatMessage({ id: "account_profileSettings_profilePicture" })}:
       </Text>
       <Avatar
@@ -119,14 +148,19 @@ const ProfileSettings: FC = () => {
         }}
       />
       <br />
-      <Button variant="outlined" color="inherit" onClick={handleChooseImage}>
-        <Text variant="body1" fontFamily={regularFont}>
+      <Button variant="outlined" color="secondary" onClick={handleChooseImage}>
+        <Text variant="body1" fontFamily={regularFont} color="textPrimary">
           {intl.formatMessage({ id: "common_chooseImage" })}
         </Text>
       </Button>
       <br />
       <br />
-      <Text variant="h6" fontWeight="bold" fontFamily={heavyFont}>
+      <Text
+        variant="h6"
+        fontWeight="bold"
+        fontFamily={heavyFont}
+        color="textPrimary"
+      >
         {intl.formatMessage({ id: "common_preferredLanguage" })}:
       </Text>
       <FormControl sx={{ minWidth: 300 }}>
@@ -136,22 +170,22 @@ const ProfileSettings: FC = () => {
           onChange={handlePreferredLanguage}
         >
           <MenuItem value="en">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_en" })}
             </Text>
           </MenuItem>
           <MenuItem value="uk">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_uk" })}
             </Text>
           </MenuItem>
           <MenuItem value="ru">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_ru" })}
             </Text>
           </MenuItem>
           <MenuItem value="de">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "common_language_de" })}
             </Text>
           </MenuItem>
@@ -159,38 +193,43 @@ const ProfileSettings: FC = () => {
       </FormControl>
       <br />
       <br />
-      <Text variant="h6" fontWeight="bold" fontFamily={heavyFont}>
+      <Text
+        variant="h6"
+        fontWeight="bold"
+        fontFamily={heavyFont}
+        color="textPrimary"
+      >
         {intl.formatMessage({ id: "common_timeZone" })}:
       </Text>
       <FormControl sx={{ minWidth: 300 }}>
         <Select id="timeZone" value={timeZone} onChange={handleSetTimeZone}>
           <MenuItem value="timeZone_us_pacific">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "timeZone_us_pacific" })}
             </Text>
           </MenuItem>
           <MenuItem value="timeZone_us_mountain">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "timeZone_us_mountain" })}
             </Text>
           </MenuItem>
           <MenuItem value="timeZone_us_central">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "timeZone_us_central" })}
             </Text>
           </MenuItem>
           <MenuItem value="timeZone_us_eastern">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "timeZone_us_eastern" })}
             </Text>
           </MenuItem>
           <MenuItem value="timeZone_at_vienna">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "timeZone_at_vienna" })}
             </Text>
           </MenuItem>
           <MenuItem value="timeZone_ua_kyiv">
-            <Text variant="body1" fontFamily={regularFont}>
+            <Text variant="body1" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({ id: "timeZone_ua_kyiv" })}
             </Text>
           </MenuItem>
@@ -201,10 +240,10 @@ const ProfileSettings: FC = () => {
       <Box display="flex" justifyContent="flex-end">
         <Button
           variant="contained"
-          color="primary"
+          sx={{ backgroundColor: theme.palette.secondary.light }}
           onClick={handleUpdateSettings}
         >
-          <Text variant="body1" fontFamily={regularFont}>
+          <Text variant="body1" fontFamily={regularFont} color="textPrimary">
             {intl.formatMessage({ id: "common_settings_save" })}
           </Text>
         </Button>

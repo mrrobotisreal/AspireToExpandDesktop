@@ -91,7 +91,16 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(to bottom, #4a90e2, #fbc531);
+  background: linear-gradient(
+    to left top,
+    #78290f,
+    #ff7d00,
+    #ffbf69,
+    #cbf3f0,
+    #2ec4b6,
+    #006d77,
+    #001524
+  );
   margin: 0;
   font-family: "Bauhaus-Medium", Arial, sans-serif;
 }
