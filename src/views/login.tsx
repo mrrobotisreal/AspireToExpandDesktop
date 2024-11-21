@@ -287,10 +287,9 @@ const Login: FC = () => {
         <Button
           variant="text"
           onClick={() => setIsLoginVisible(!isLoginVisible)}
-          // color="primary"
-          sx={{ color: theme.palette.primary.dark }}
+          sx={{ color: theme.palette.secondary.dark }}
         >
-          <Text variant="body2" fontFamily={regularFont}>
+          <Text variant="body2" fontFamily={regularFont} color="textPrimary">
             {intl.formatMessage({
               id: isLoginVisible
                 ? "welcomeScreen_notRegisteredYetButton"
@@ -300,7 +299,7 @@ const Login: FC = () => {
         </Button>
         <Button
           variant="contained"
-          sx={{ minWidth: 120 }}
+          sx={{ minWidth: 120, backgroundColor: theme.palette.secondary.light }}
           onClick={() => {
             if (isLoginVisible) {
               handleLogin();
@@ -313,7 +312,7 @@ const Login: FC = () => {
           {isLoading ? (
             <CircularLoading />
           ) : (
-            <Text variant="button" fontFamily={regularFont}>
+            <Text variant="button" fontFamily={regularFont} color="textPrimary">
               {intl.formatMessage({
                 id: isLoginVisible
                   ? "common_login"

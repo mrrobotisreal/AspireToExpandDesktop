@@ -7,7 +7,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Skeleton,
   Stack,
   Tooltip,
 } from "@mui/material";
@@ -21,30 +20,22 @@ import {
 
 import { useStudentContext } from "../../context/studentContext";
 import { useThemeContext } from "../../context/themeContext";
+import useClassroomSocket from "../../hooks/useClassroomSocket";
 import Layout from "../layout/layout";
 import Text from "../text/text";
 
+const url = `ws://localhost:9999/?type=student&room=123`;
+
 const Classroom: FC = () => {
   const intl = useIntl();
-  const { info, getInfo, updateInfo } = useStudentContext();
-  const { theme, themeCustom, regularFont, heavyFont } = useThemeContext();
+  const { getInfo, updateInfo } = useStudentContext();
+  const { theme, regularFont, heavyFont } = useThemeContext();
+  const { sendMessage, peerConnection } = useClassroomSocket({
+    url,
+  });
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
-  const peerConnection = useRef<RTCPeerConnection>(
-    new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: [
-            "stun:stun1.l.google.com:19302",
-            "stun:stun2.l.google.com:19302",
-          ],
-        },
-      ],
-    })
-  );
-  const socket = new WebSocket("ws://localhost:9999/video");
   const localStream = useRef<MediaStream | null>(null);
-  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [isMicOn, setIsMicOn] = useState(true);
   const [audioDevices, setAudioDevices] = useState<MediaStreamTrack[]>([]);
   const [selectedAudioDevice, setSelectedAudioDevice] = useState("Default");
@@ -54,6 +45,18 @@ const Classroom: FC = () => {
   const [callSettingsAnchorEl, setCallSettingsAnchorEl] =
     useState<null | HTMLElement>(null);
   const [callSettingsMenuIsOpen, setCallSettingsMenuIsOpen] = useState(false);
+
+  peerConnection.onicecandidate = (event) => {
+    if (event.candidate) {
+      sendMessage(JSON.stringify({ type: "candidate", data: event.candidate }));
+    }
+  };
+
+  peerConnection.ontrack = (event) => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = event.streams[0];
+    }
+  };
 
   const handleOpenCallSettingsMenu = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -67,9 +70,7 @@ const Classroom: FC = () => {
   };
 
   const toggleVideo = () => {
-    console.log("Toggling video...");
     const videoTrack = localStream.current?.getVideoTracks()[0];
-    console.log("Video track: ", videoTrack);
 
     if (videoTrack) {
       videoTrack.enabled = !videoTrack.enabled;
@@ -77,9 +78,7 @@ const Classroom: FC = () => {
     }
   };
   const toggleAudio = () => {
-    console.log("Toggling audio...");
     const audioTrack = localStream.current?.getAudioTracks()[0];
-    console.log("Audio track: ", audioTrack);
 
     if (audioTrack) {
       audioTrack.enabled = !audioTrack.enabled;
@@ -104,7 +103,7 @@ const Classroom: FC = () => {
       setVideoDevices(videoStreamDevices);
       setSelectedVideoDevice(videoStreamDevices[0].label);
       stream.getTracks().forEach((track) => {
-        peerConnection.current.addTrack(track, stream);
+        peerConnection.addTrack(track, stream);
       });
       setIsMicOn(true);
       setIsVideoOn(true);
@@ -114,61 +113,8 @@ const Classroom: FC = () => {
   };
 
   useEffect(() => {
-    socket.onmessage = async (message) => {
-      console.log("Received message: ", message.data);
-      const { event, payload } = JSON.parse(message.data);
-
-      if (event === "offer") {
-        await peerConnection.current.setRemoteDescription(
-          new RTCSessionDescription(payload)
-        );
-        const answer = await peerConnection.current.createAnswer();
-        await peerConnection.current.setLocalDescription(answer);
-        socket.send(JSON.stringify({ event: "answer", payload: answer }));
-      } else if (event === "answer") {
-        await peerConnection.current.setRemoteDescription(
-          new RTCSessionDescription(payload)
-        );
-      } else if (event === "ice-candidate") {
-        await peerConnection.current.addIceCandidate(
-          new RTCIceCandidate(payload)
-        );
-      }
-    };
-
-    peerConnection.current.onicecandidate = (event) => {
-      console.log("ICE candidate: ", event.candidate);
-      if (event.candidate) {
-        console.log("Sending ICE candidate...");
-        socket.send(
-          JSON.stringify({ event: "ice-candidate", payload: event.candidate })
-        );
-      }
-    };
-
-    peerConnection.current.ontrack = (event) => {
-      const [stream] = event.streams;
-
-      if (remoteVideoRef.current) {
-        console.log("Setting remote video stream...");
-        remoteVideoRef.current.srcObject = stream;
-      }
-      setRemoteStream(stream);
-    };
-
     startMedia();
-
-    return () => {
-      peerConnection.current.close();
-      socket.close();
-    };
   }, []);
-
-  const createOffer = async () => {
-    const offer = await peerConnection.current.createOffer();
-    await peerConnection.current.setLocalDescription(offer);
-    socket.send(JSON.stringify({ event: "offer", payload: offer }));
-  };
 
   useEffect(() => {
     const storedStudentInfo = getInfo();
@@ -181,7 +127,7 @@ const Classroom: FC = () => {
   }, []);
 
   return (
-    <Layout title={"Classroom"}>
+    <Layout title={intl.formatMessage({ id: "common_classroom" })}>
       <Tooltip title="Alina's video" placement="top" arrow>
         <video
           ref={remoteVideoRef}
@@ -241,7 +187,7 @@ const Classroom: FC = () => {
           >
             <Box padding={2}>
               <Text variant="h6" fontFamily={heavyFont} color="textPrimary">
-                Call settings
+                {intl.formatMessage({ id: "classroom_callSettings" })}
               </Text>
               <Divider sx={{ my: 0.5 }} />
               <Text
@@ -250,7 +196,7 @@ const Classroom: FC = () => {
                 fontWeight="bold"
                 color="textPrimary"
               >
-                Video
+                {intl.formatMessage({ id: "common_video" })}
               </Text>
               {videoDevices.map((device) => (
                 <MenuItem key={device.label}>
@@ -272,7 +218,7 @@ const Classroom: FC = () => {
                 fontWeight="bold"
                 color="textPrimary"
               >
-                Audio
+                {intl.formatMessage({ id: "common_audio" })}
               </Text>
               {audioDevices.map((device) => (
                 <MenuItem key={device.label}>
@@ -316,10 +262,10 @@ const Classroom: FC = () => {
           <Button
             variant="contained"
             sx={{ backgroundColor: theme.palette.secondary.light }}
-            onClick={createOffer}
+            onClick={() => console.log("Button doesn't do anything yet...")} // TODO: implement this later
           >
             <Text variant="button" fontFamily={regularFont} color="textPrimary">
-              Join class
+              {intl.formatMessage({ id: "classroom_joinClass" })}
             </Text>
           </Button>
         </Stack>
