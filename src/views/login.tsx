@@ -8,6 +8,7 @@ import { useThemeContext } from "../context/themeContext";
 import { useStudentContext } from "../context/studentContext";
 import { useMessagesContext } from "../context/messagesContext";
 import { MAIN_SERVER_URL } from "../constants/urls";
+import useEncryption from "../hooks/useEncryption";
 
 import CircularLoading from "./loading/circular";
 import Text from "./text/text";
@@ -23,8 +24,9 @@ const Login: FC = () => {
     regularFont,
     heavyFont,
   } = useThemeContext();
-  const { getInfo, updateInfo } = useStudentContext();
+  const { getInfo, updateInfo, updateInfoOnServer } = useStudentContext();
   const { changeLocale } = useMessagesContext();
+  const { generateKeyPair } = useEncryption();
   const [isLoginVisible, setIsLoginVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [registrationCode, setRegistrationCode] = useState("");
@@ -130,6 +132,19 @@ const Login: FC = () => {
             console.error(
               "Student ID not found in response, cannot connect to chat server!"
             ); // TODO: localize; add toast
+          }
+          if (!body.public_key) {
+            const keyPair = await generateKeyPair();
+            if (keyPair) {
+              updateInfoOnServer({
+                email_address: emailAddress,
+                public_key: keyPair.publicKey,
+              });
+            } else {
+              console.error(
+                "Error generating key pair, data not being encrypted!"
+              ); // TODO: localize; add toast
+            }
           }
           navigate("/home");
         } else {

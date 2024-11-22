@@ -24,6 +24,7 @@ import bcrypt from "bcryptjs";
 
 import { MAIN_SERVER_URL } from "../../constants/urls";
 import { useThemeContext } from "../../context/themeContext";
+import useEncryption from "../../hooks/useEncryption";
 import CircularLoading from "../loading/circular";
 import Layout from "../layout/layout";
 import Text from "../text/text";
@@ -43,6 +44,7 @@ const StudentInfoForm: FC = () => {
   const { state } = useLocation();
   const { firstName, lastName, email } = state;
   const { theme, regularFont, heavyFont } = useThemeContext();
+  const { generateKeyPair } = useEncryption();
   const [nativeLanguage, setNativeLanguage] = useState("uk");
   const [preferredLanguage, setPreferredLanguage] = useState("en");
   const [enteredFirstName, setEnteredFirstName] = useState(firstName);
@@ -167,10 +169,18 @@ const StudentInfoForm: FC = () => {
   const hashPasswordAndSendInfo = async () => {
     setIsLoading(true);
     try {
+      const keyPair = await generateKeyPair();
+      if (keyPair.privateKey === "" || keyPair.publicKey === "") {
+        console.log(
+          "Error generating key pair, your data is NOT being encrypted."
+        );
+      }
+      // TODO: store private key in secure enclave
+      localStorage.setItem(`privateKey-${emailAddress}`, keyPair.privateKey);
+      localStorage.setItem(`publicKey-${emailAddress}`, keyPair.publicKey);
       const salt = window.electronAPI.getSalt();
       const hashedPassword = bcrypt.hashSync(password, salt);
       const shortenedHash = hashedPassword.slice(0, 32);
-      console.log("(StudentInfoForm) Hashed password: ", shortenedHash);
       const response = await fetch(`${MAIN_SERVER_URL}/students/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
@@ -184,6 +194,7 @@ const StudentInfoForm: FC = () => {
           password: shortenedHash,
           theme_mode: "system",
           font_style: "Bauhaus",
+          public_key: keyPair.publicKey,
         }),
       });
       setIsConfirmInfoDialogOpen(false);

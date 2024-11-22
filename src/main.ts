@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "path";
 import WebSocket from "ws";
 import fs from "fs";
+import { generateKeyPairSync } from "crypto";
 import "dotenv/config";
 
 let mainWindow: BrowserWindow | null = null;
@@ -114,6 +115,22 @@ function createWindow(): void {
     const fileBuffer = fs.readFileSync(filePath);
 
     return fileBuffer;
+  });
+  ipcMain.handle("generate-key-pair", async () => {
+    const { privateKey, publicKey } = generateKeyPairSync("rsa", {
+      modulusLength: 2048,
+      publicKeyEncoding: {
+        type: "pkcs1",
+        format: "pem",
+      },
+      privateKeyEncoding: {
+        type: "pkcs1",
+        format: "pem",
+      },
+    });
+
+    console.log("Key pair successfully created!");
+    return { privateKey, publicKey };
   });
 }
 
