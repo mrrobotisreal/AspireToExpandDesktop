@@ -19,7 +19,6 @@ import {
 } from "@mui/icons-material";
 
 import { VIDEO_SERVER_URL } from "../../constants/urls";
-console.log("VIDEO_SERVER_URL: ", VIDEO_SERVER_URL);
 import { useStudentContext } from "../../context/studentContext";
 import { useThemeContext } from "../../context/themeContext";
 import useClassroomSocket from "../../hooks/useClassroomSocket";

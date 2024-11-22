@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "path";
 import WebSocket from "ws";
+import fs from "fs";
 import "dotenv/config";
 
 let mainWindow: BrowserWindow | null = null;
@@ -59,23 +60,6 @@ function createWindow(): void {
 
   mainWindow.maximize();
   mainWindow.webContents.openDevTools();
-  // TODO: see if I need the code below still after deploying server
-  // mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
-  //   (details, callback) => {
-  //     callback({ requestHeaders: { Origin: "*", ...details.requestHeaders } });
-  //   }
-  // );
-  // mainWindow.webContents.session.webRequest.onHeadersReceived(
-  //   (details, callback) => {
-  //     callback({
-  //       responseHeaders: {
-  //         "Access-Control-Allow-Origin": "*",
-  //         "Access-Control-Allow-Headers": "*",
-  //         ...details.responseHeaders,
-  //       },
-  //     });
-  //   }
-  // );
 
   mainWindow.loadFile("index.html");
   if (process.env.NODE_ENV === "development") {
@@ -83,7 +67,6 @@ function createWindow(): void {
     mainWindow.loadURL("http://localhost:9000");
   } else {
     console.log("Loading from local index.html");
-    // mainWindow.loadFile('index.html');
     mainWindow.loadFile(path.join(__dirname, "../index.html"));
   }
 
@@ -126,6 +109,11 @@ function createWindow(): void {
       // @ts-ignore
       return result.filePaths[0];
     }
+  });
+  ipcMain.handle("read-file", async (_, filePath: string) => {
+    const fileBuffer = fs.readFileSync(filePath);
+
+    return fileBuffer;
   });
 }
 

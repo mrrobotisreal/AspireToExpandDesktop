@@ -20,6 +20,7 @@ interface StudentInfo {
   preferredLanguage?: string;
   themeMode?: ThemeMode;
   fontStyle?: AppFontStyle;
+  profilePictureURL?: string;
   profilePicturePath?: string;
   timeZone?: string;
   // TODO: Add more fields
@@ -59,6 +60,7 @@ interface UpdateStudentInfoRequest {
   preferred_language?: string;
   theme_mode?: ThemeMode;
   font_style?: AppFontStyle;
+  profile_picture_url?: string;
   profile_picture_path?: string;
   time_zone?: string;
 }

@@ -109,6 +109,7 @@ const Login: FC = () => {
             preferredLanguage: body.preferred_language,
             themeMode: body.theme_mode,
             fontStyle: body.font_style,
+            profilePictureURL: body.profile_picture_url,
             profilePicturePath: body.profile_picture_path,
             timeZone: body.time_zone,
           });

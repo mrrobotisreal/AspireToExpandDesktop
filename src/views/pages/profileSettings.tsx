@@ -14,6 +14,7 @@ import { useIntl } from "react-intl";
 import { useStudentContext } from "../../context/studentContext";
 import { useMessagesContext } from "../../context/messagesContext";
 import { useThemeContext } from "../../context/themeContext";
+import useUploadImage from "../../hooks/useUploadImage";
 import Layout from "../layout/layout";
 import Text from "../text/text";
 import Toast from "../alerts/toast";
@@ -22,15 +23,22 @@ const ProfileSettings: FC = () => {
   const intl = useIntl();
   const { info, getInfo, updateInfo, updateInfoOnServer } = useStudentContext();
   const { changeLocale } = useMessagesContext();
-  const { theme, themeCustom, regularFont, heavyFont } = useThemeContext();
+  const { theme, regularFont, heavyFont } = useThemeContext();
+  const { uploadImage } = useUploadImage();
+  const [profilePictureURL, setProfilePictureURL] = useState(
+    info.profilePictureURL ?? ""
+  );
   const [profilePicturePath, setProfilePicturePath] = useState(
     info.profilePicturePath ?? ""
   );
   const [preferredLanguage, setPreferredLanguage] = useState(
     info.preferredLanguage ?? "en"
   );
+  const [avatarSrc, setAvatarSrc] = useState(
+    info.profilePictureURL ?? info.profilePicturePath ?? ""
+  );
   const [timeZone, setTimeZone] = useState(
-    info.timeZone ?? "US Pacific (GMT-8/GMT-7)"
+    info.timeZone ?? "timeZone_us_pacific"
   );
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(
@@ -43,10 +51,33 @@ const ProfileSettings: FC = () => {
   const handleChooseImage = async () => {
     const filePath = await window.electronAPI.selectImage();
 
-    console.log("File path: ", `file://${filePath}`);
-
     if (filePath) {
-      setProfilePicturePath(`file://${filePath}`);
+      const fileExtension = filePath.split(".").pop();
+      console.log(`File extension: ${fileExtension}`);
+
+      if (!fileExtension) {
+        console.error("File extension is required to upload image");
+        return;
+      }
+
+      if (!info.studentId || info.studentId === "") {
+        console.error("Student ID is required to upload image");
+        return;
+      }
+
+      try {
+        const uploadedImage = await uploadImage(
+          filePath,
+          fileExtension,
+          info.studentId
+        );
+
+        if (uploadedImage) {
+          setProfilePictureURL(uploadedImage.imageURL);
+        }
+      } catch (error) {
+        console.error("Error uploading image: ", error);
+      }
     }
   };
 
@@ -65,6 +96,7 @@ const ProfileSettings: FC = () => {
       await updateInfoOnServer({
         email_address: info.emailAddress,
         preferred_language: preferredLanguage,
+        profile_picture_url: profilePictureURL,
         profile_picture_path: profilePicturePath,
         time_zone: timeZone,
       });
@@ -77,6 +109,7 @@ const ProfileSettings: FC = () => {
     updateInfo({
       ...info,
       preferredLanguage,
+      profilePictureURL,
       profilePicturePath,
       timeZone,
     });
@@ -109,6 +142,10 @@ const ProfileSettings: FC = () => {
   }, []);
 
   useEffect(() => {
+    if (info.profilePictureURL) {
+      setProfilePictureURL(info.profilePictureURL);
+    }
+
     if (info.profilePicturePath) {
       setProfilePicturePath(info.profilePicturePath);
     }
@@ -121,6 +158,16 @@ const ProfileSettings: FC = () => {
       setTimeZone(info.timeZone);
     }
   }, [info]);
+
+  useEffect(() => {
+    if (profilePictureURL && profilePictureURL !== "") {
+      setAvatarSrc(profilePictureURL);
+    } else if (profilePicturePath && profilePicturePath !== "") {
+      setAvatarSrc(profilePicturePath);
+    } else {
+      setAvatarSrc("");
+    }
+  }, [profilePictureURL, profilePicturePath]);
 
   return (
     <Layout title={intl.formatMessage({ id: "common_account" })}>
@@ -141,7 +188,7 @@ const ProfileSettings: FC = () => {
         {intl.formatMessage({ id: "account_profileSettings_profilePicture" })}:
       </Text>
       <Avatar
-        src={profilePicturePath}
+        src={avatarSrc}
         sx={{
           width: 160,
           height: 160,
