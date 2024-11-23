@@ -1,9 +1,17 @@
-import React, { FC, useState, useRef, useEffect } from "react";
+import React, {
+  FC,
+  RefObject,
+  useState,
+  useRef,
+  useMemo,
+  useEffect,
+} from "react";
 import { useIntl } from "react-intl";
 import {
   Box,
   Button,
   Divider,
+  Grid,
   IconButton,
   Menu,
   MenuItem,
@@ -26,6 +34,11 @@ import Layout from "../layout/layout";
 import Text from "../text/text";
 
 const url = `${VIDEO_SERVER_URL}/?type=student&room=123`;
+// const videoRefs: { [id: string]: React.RefObject<HTMLVideoElement> } = {};
+// videoRefs["local"] = createRef<HTMLVideoElement>();
+// videoRefs["student1"] = createRef<HTMLVideoElement>();
+// videoRefs["student2"] = createRef<HTMLVideoElement>();
+// videoRefs["student3"] = createRef<HTMLVideoElement>();
 
 const Classroom: FC = () => {
   const intl = useIntl();
@@ -34,8 +47,20 @@ const Classroom: FC = () => {
   const { sendMessage, peerConnection } = useClassroomSocket({
     url,
   });
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef2 = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef3 = useRef<HTMLVideoElement>(null);
+  // const participants = useMemo(() => [
+  //   localVideoRef,
+  //   remoteVideoRef,
+  //   remoteVideoRef2,
+  //   remoteVideoRef3,
+  // ], [localVideoRef, remoteVideoRef, remoteVideoRef2, remoteVideoRef3]);
+  const [participants, setParticipants] = useState<
+    Array<RefObject<HTMLVideoElement>>
+  >([localVideoRef, remoteVideoRef, remoteVideoRef2, remoteVideoRef3]);
+  const participantCount = participants.length;
   const localStream = useRef<MediaStream | null>(null);
   const [isMicOn, setIsMicOn] = useState(true);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
@@ -61,6 +86,16 @@ const Classroom: FC = () => {
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = event.streams[0];
     }
+  };
+
+  const addParticipant = (newRef: RefObject<HTMLVideoElement>) => {
+    setParticipants((prevParticipants) => [...prevParticipants, newRef]);
+  };
+
+  const removeParticipant = (id: number) => {
+    setParticipants((prevParticipants) =>
+      prevParticipants.filter((_, index) => index !== id)
+    );
   };
 
   const handleOpenCallSettingsMenu = (
@@ -183,7 +218,128 @@ const Classroom: FC = () => {
 
   return (
     <Layout title={intl.formatMessage({ id: "common_classroom" })}>
-      <Tooltip title="Alina's video" placement="top" arrow>
+      <Grid container sx={{ height: "78vh" }}>
+        {participantCount === 2 && (
+          <>
+            <Grid item xs={12} sx={{ height: "38vh" }}>
+              <video
+                ref={participants[1]}
+                autoPlay
+                playsInline
+                style={{
+                  margin: 1,
+                  height: "38vh",
+                  width: "100%",
+                  // height: "50%",
+                  border: "1px solid black",
+                  borderRadius: "6px",
+                  backgroundImage:
+                    "linear-gradient(to left top,#78290f,#ff7d00,#ffbf69,#cbf3f0,#2ec4b6,#006d77,#001524)",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sx={{ height: "38vh" }}>
+              <video
+                ref={participants[0]}
+                autoPlay
+                playsInline
+                style={{
+                  margin: 1,
+                  height: "38vh",
+                  width: "100%",
+                  // height: "50%",
+                  border: "1px solid black",
+                  borderRadius: "6px",
+                  backgroundImage:
+                    "linear-gradient(to left top,#78290f,#ff7d00,#ffbf69,#cbf3f0,#2ec4b6,#006d77,#001524)",
+                }}
+              />
+            </Grid>
+          </>
+        )}
+        {participantCount === 3 && (
+          <>
+            <Grid item xs={12} sx={{ height: "38vh" }}>
+              <video
+                ref={participants[1]}
+                autoPlay
+                playsInline
+                style={{
+                  margin: 1,
+                  // height: "50%",
+                  width: "100%",
+                  height: "38vh",
+                  border: "1px solid black",
+                  borderRadius: "6px",
+                  backgroundImage:
+                    "linear-gradient(to left top,#78290f,#ff7d00,#ffbf69,#cbf3f0,#2ec4b6,#006d77,#001524)",
+                }}
+              />
+            </Grid>
+            <Grid item xs={6} sx={{ height: "38vh" }}>
+              <video
+                ref={participants[2]}
+                autoPlay
+                playsInline
+                style={{
+                  margin: 1,
+                  // height: "50%",
+                  width: "100%",
+                  height: "38vh",
+                  border: "1px solid black",
+                  borderRadius: "6px",
+                  backgroundImage:
+                    "linear-gradient(to left top,#78290f,#ff7d00,#ffbf69,#cbf3f0,#2ec4b6,#006d77,#001524)",
+                }}
+              />
+            </Grid>
+            <Grid item xs={6} sx={{ height: "38vh" }}>
+              <video
+                ref={participants[0]}
+                autoPlay
+                playsInline
+                style={{
+                  margin: 1,
+                  // height: "50%",
+                  width: "100%",
+                  height: "38vh",
+                  border: "1px solid black",
+                  borderRadius: "6px",
+                  backgroundImage:
+                    "linear-gradient(to left top,#78290f,#ff7d00,#ffbf69,#cbf3f0,#2ec4b6,#006d77,#001524)",
+                }}
+              />
+            </Grid>
+          </>
+        )}
+        {participantCount === 4 && (
+          <>
+            {participants.toReversed().map((participant, index) => (
+              <Grid key={index} item xs={6} sx={{ height: "38vh" }}>
+                <video
+                  ref={participant}
+                  autoPlay
+                  playsInline
+                  style={{
+                    margin: 1,
+                    height: "38vh",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                    // height: "50%",
+                    border: "1px solid black",
+                    borderRadius: "6px",
+                    backgroundImage:
+                      "linear-gradient(to left top,#78290f,#ff7d00,#ffbf69,#cbf3f0,#2ec4b6,#006d77,#001524)",
+                  }}
+                />
+              </Grid>
+            ))}
+          </>
+        )}
+      </Grid>
+      {/* <Tooltip title="Alina's video" placement="top" arrow>
         <video
           ref={remoteVideoRef}
           autoPlay
@@ -212,7 +368,7 @@ const Classroom: FC = () => {
               "linear-gradient(to left top,#78290f,#ff7d00,#ffbf69,#cbf3f0,#2ec4b6,#006d77,#001524)",
           }}
         />
-      </Tooltip>
+      </Tooltip> */}
       <Box padding={2}>
         <Stack direction="row" justifyContent="space-evenly">
           <IconButton
