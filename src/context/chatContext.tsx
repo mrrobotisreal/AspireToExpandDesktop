@@ -41,6 +41,16 @@ const getChatID = (message: ChatMessage): string => {
   return `${message.toID}_${message.fromID}`;
 };
 
+export const createChatID = (
+  studentID1: string,
+  studentID2: string
+): string => {
+  if (studentID1 < studentID2) {
+    return `${studentID1}_${studentID2}`;
+  }
+  return `${studentID2}_${studentID1}`;
+};
+
 export interface Student {
   studentid: string;
   preferredname: string;
@@ -57,7 +67,7 @@ interface ChatContextProps {
   sendMessage: (message: ChatMessage) => void;
   students: Student[];
   studentsAreLoading: boolean;
-  fetchAllStudents: () => Promise<string[]>;
+  fetchAllStudents: () => Promise<Student[]>;
 }
 
 const ChatContext = createContext<ChatContextProps>({
@@ -91,16 +101,23 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
         `${HTTP_CHAT_SERVER_URL}/chats?studentID=${studentId}`
       );
       const data = await response.json();
+
+      if (!data) {
+        localStorage.setItem("chats", JSON.stringify([]));
+        await sleep(1500); // TODO: remove this; for testing only right now
+        setChatsAreLoading(false);
+        return;
+      }
+
       const sortedData = data.sort((a: Chat, b: Chat) => {
         if (a.mostRecentMessage.time > b.mostRecentMessage.time) return -1;
         if (a.mostRecentMessage.time < b.mostRecentMessage.time) return 1;
         return 0;
       });
-
       setChats(sortedData);
 
       localStorage.setItem("chats", JSON.stringify(sortedData));
-      await sleep(1500);
+      await sleep(1500); // TODO: remove this; for testing only right now
       setChatsAreLoading(false);
     } catch (error) {
       console.error("Error fetching chats:", error);
@@ -117,6 +134,13 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
       );
       const data = await response.json();
 
+      if (!data) {
+        setMessages([]);
+        localStorage.setItem(`messages_${chatId}_${page}`, JSON.stringify([]));
+        await sleep(1500); // TODO: remove this; for testing only right now
+        setMessagesAreLoading(false);
+        return;
+      }
       setMessages(data);
 
       // TODO: Implement pagination and syncing with the server
@@ -146,23 +170,18 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
       const response = await fetch(`${MAIN_SERVER_URL}/students`);
       const data = await response.json();
 
-      console.log("Students:", JSON.stringify(data, null, 2));
-
       // TODO: Implement pagination
       setStudents(data);
 
       localStorage.setItem("students", JSON.stringify(data));
 
-      const studentNames = data.map(
-        (student: Student) => student.preferredname
+      const filteredStudents = data.filter(
+        (student: Student) => student.preferredname !== info.preferredName
       );
-      const filteredStudentNames = studentNames.filter(
-        (name: string) => name !== info.preferredName
-      );
-      await sleep(1500);
+      await sleep(1500); // TODO: remove this; for testing only right now
       setStudentsAreLoading(false);
 
-      return filteredStudentNames;
+      return filteredStudents;
     } catch (error) {
       console.error("Error fetching students:", error);
       setStudentsAreLoading(false);
