@@ -1,27 +1,80 @@
-import React, { FC, useState, useRef, useEffect } from "react";
+/**
+ * THIS FILE IS FOR TESTING PURPOSES ONLY
+ */
+import { FC, RefObject, useCallback, useRef, useState, useEffect } from "react";
 import { useIntl } from "react-intl";
 
-import { VIDEO_SERVER_URL } from "../../constants/urls";
 import { useStudentContext } from "../../context/studentContext";
-import { useThemeContext } from "../../context/themeContext";
-import useClassroomSocket from "../../hooks/useClassroomSocket";
 import Layout from "../layout/layout";
+import useClassroom from "../../hooks/useClassroom";
 
-import Controls from "./classroomComponents/controls";
-import Videos from "./classroomComponents/videos";
-
-const url = `${VIDEO_SERVER_URL}/?type=student&room=123`;
+import Controls from "./classroomComponents/_controls";
+import Videos, { VideoRefObject } from "./classroomComponents/_videos";
 
 const Classroom: FC = () => {
   const intl = useIntl();
-  const { getInfo, updateInfo } = useStudentContext();
-  const { sendMessage, peerConnection } = useClassroomSocket({
-    url,
-  });
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const { info, getInfo, updateInfo } = useStudentContext();
   const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef2 = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef3 = useRef<HTMLVideoElement>(null);
   const localStream = useRef<MediaStream | null>(null);
-  const [isRemoteStreamActive, setIsRemoteStreamActive] = useState(false);
+  const remoteStream = useRef<MediaStream | null>(null);
+  const remoteStream2 = useRef<MediaStream | null>(null);
+  const remoteStream3 = useRef<MediaStream | null>(null);
+  const [participants, setParticipants] = useState<VideoRefObject[]>([
+    {
+      id: info.studentId || "",
+      label: info.preferredName || "",
+      ref: localVideoRef,
+    },
+  ]);
+  const addParticipant = useCallback<
+    (id: string, label: string, stream: MediaStream) => void
+  >(
+    (id, label, stream) => {
+      let newParticipantRef: RefObject<HTMLVideoElement>;
+
+      if (participants.length === 1) {
+        remoteStream.current = stream;
+        newParticipantRef = remoteVideoRef;
+        if (remoteVideoRef.current) {
+          remoteVideoRef.current.srcObject = stream;
+        }
+      } else if (participants.length === 2) {
+        remoteStream2.current = stream;
+        newParticipantRef = remoteVideoRef2;
+        if (remoteVideoRef2.current) {
+          remoteVideoRef2.current.srcObject = stream;
+        }
+      } else if (participants.length === 3) {
+        remoteStream3.current = stream;
+        newParticipantRef = remoteVideoRef3;
+        if (remoteVideoRef3.current) {
+          remoteVideoRef3.current.srcObject = stream;
+        }
+      }
+      setParticipants((prevParticipants) => [
+        ...prevParticipants,
+        {
+          id,
+          label,
+          ref: newParticipantRef,
+        },
+      ]);
+    },
+    [remoteVideoRef, remoteVideoRef2, remoteVideoRef3]
+  );
+  const removeParticipant = useCallback<(id: string) => void>((id) => {
+    setParticipants((prevParticipants) =>
+      prevParticipants.filter((participant) => participant.id !== id)
+    );
+  }, []);
+  const { peerConnections } = useClassroom({
+    addParticipant,
+    removeParticipant,
+    localStream: localStream.current,
+  });
   const [isMicOn, setIsMicOn] = useState(true);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedAudioDeviceLabel, setSelectedAudioDeviceLabel] =
@@ -35,25 +88,6 @@ const Classroom: FC = () => {
   const [callSettingsAnchorEl, setCallSettingsAnchorEl] =
     useState<null | HTMLElement>(null);
   const [callSettingsMenuIsOpen, setCallSettingsMenuIsOpen] = useState(false);
-  const [isCallStarted, setIsCallStarted] = useState(false);
-
-  peerConnection.onicecandidate = (event) => {
-    if (event.candidate) {
-      sendMessage(JSON.stringify({ type: "candidate", data: event.candidate }));
-    }
-  };
-
-  peerConnection.ontrack = (event) => {
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = event.streams[0];
-    }
-    setIsRemoteStreamActive(true);
-  };
-  peerConnection.onconnectionstatechange = () => {
-    if (peerConnection.connectionState === "disconnected") {
-      setIsRemoteStreamActive(false);
-    }
-  };
 
   const handleOpenCallSettingsMenu = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -148,32 +182,11 @@ const Classroom: FC = () => {
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
-      stream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, stream);
-      });
       setIsMicOn(true);
       setIsVideoOn(true);
       await fetchDevices();
     } catch (error) {
       console.error("Error starting media: ", error);
-    }
-  };
-
-  const joinClass = async () => {
-    if (!peerConnection) {
-      return;
-    }
-
-    if (isCallStarted) {
-      peerConnection.close();
-      setIsCallStarted(false);
-      setIsRemoteStreamActive(false);
-      // TODO: send signal that the call is ended for other participants
-    } else {
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
-      sendMessage(JSON.stringify({ type: "offer", data: offer }));
-      setIsCallStarted(true);
     }
   };
 
@@ -193,28 +206,22 @@ const Classroom: FC = () => {
 
   return (
     <Layout title={intl.formatMessage({ id: "common_classroom" })}>
-      <Videos
-        localVideoRef={localVideoRef}
-        remoteVideoRef={remoteVideoRef}
-        isRemoteStreamActive={isRemoteStreamActive}
-      />
+      <Videos participants={participants} />
       <Controls
-        isCallStarted={isCallStarted}
+        isMicOn={isMicOn}
+        isVideoOn={isVideoOn}
+        audioDevices={audioDevices}
+        videoDevices={videoDevices}
+        selectedAudioDeviceLabel={selectedAudioDeviceLabel}
+        selectedVideoDeviceLabel={selectedVideoDeviceLabel}
+        handleSelectAudioDevice={handleSelectAudioDevice}
+        handleSelectVideoDevice={handleSelectVideoDevice}
+        toggleAudio={toggleAudio}
+        toggleVideo={toggleVideo}
         handleOpenCallSettingsMenu={handleOpenCallSettingsMenu}
         handleCloseCallSettingsMenu={handleCloseCallSettingsMenu}
         callSettingsAnchorEl={callSettingsAnchorEl}
         callSettingsMenuIsOpen={callSettingsMenuIsOpen}
-        handleSelectVideoDevice={handleSelectVideoDevice}
-        toggleVideo={toggleVideo}
-        isVideoOn={isVideoOn}
-        videoDevices={videoDevices}
-        selectedVideoDeviceLabel={selectedVideoDeviceLabel}
-        handleSelectAudioDevice={handleSelectAudioDevice}
-        toggleAudio={toggleAudio}
-        isMicOn={isMicOn}
-        audioDevices={audioDevices}
-        selectedAudioDeviceLabel={selectedAudioDeviceLabel}
-        joinClass={joinClass}
       />
     </Layout>
   );

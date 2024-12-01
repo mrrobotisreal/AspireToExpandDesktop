@@ -10,10 +10,7 @@ interface UseClassroomSocketProps {
 interface UseClassroomSocketReturns {
   sendMessage: (message: string) => void;
   peerConnection: RTCPeerConnection;
-  peerConnections: { [id: string]: RTCPeerConnection };
 }
-
-const peerConnections: { [id: string]: RTCPeerConnection } = {};
 
 const useClassroomSocket = ({
   url,
@@ -129,7 +126,6 @@ const useClassroomSocket = ({
   return {
     sendMessage,
     peerConnection: peerConnection.current,
-    peerConnections,
   };
 };
 
