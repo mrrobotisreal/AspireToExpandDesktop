@@ -11,9 +11,14 @@ import {
   Tooltip,
 } from "@mui/material";
 import {
+  ExitToAppTwoTone,
+  FullscreenExitTwoTone,
+  FullscreenTwoTone,
   MicOffTwoTone,
   MicTwoTone,
+  ScreenShareTwoTone,
   SettingsTwoTone,
+  StopScreenShareTwoTone,
   VideocamOffTwoTone,
   VideocamTwoTone,
 } from "@mui/icons-material";
@@ -22,6 +27,8 @@ import { useThemeContext } from "../../../context/themeContext";
 import Text from "../../text/text";
 
 interface ControlsProps {
+  isInClassroom: boolean;
+  handleExitClassroom: () => void;
   isCallStarted: boolean;
   handleOpenCallSettingsMenu: (
     event: React.MouseEvent<HTMLButtonElement>
@@ -39,10 +46,16 @@ interface ControlsProps {
   isMicOn: boolean;
   audioDevices: { deviceId: string; label: string }[];
   selectedAudioDeviceLabel: string;
+  handleOpenScreenShareOptions: () => void;
+  isSharingScreen: boolean;
   joinClass: () => void;
+  isFullscreen: boolean;
+  toggleFullscreen: () => void;
 }
 
 const Controls: FC<ControlsProps> = ({
+  isInClassroom,
+  handleExitClassroom,
   isCallStarted,
   handleOpenCallSettingsMenu,
   handleCloseCallSettingsMenu,
@@ -58,13 +71,33 @@ const Controls: FC<ControlsProps> = ({
   isMicOn,
   audioDevices,
   selectedAudioDeviceLabel,
+  handleOpenScreenShareOptions,
+  isSharingScreen,
   joinClass,
+  isFullscreen,
+  toggleFullscreen,
 }) => {
   const intl = useIntl();
   const { theme, regularFont, heavyFont } = useThemeContext();
 
+  if (!isInClassroom) return null;
+
   return (
-    <Box padding={2}>
+    <Box
+      padding={2}
+      sx={{
+        position: isFullscreen ? "absolute" : "auto",
+        bottom: "10px",
+        left: isFullscreen ? "35%" : "auto",
+        display: "flex",
+        justifyContent: "center",
+        zIndex: 99999,
+        backgroundColor: theme.palette.background.default,
+        borderRadius: "6px",
+        overflow: "hidden",
+        transition: "bottom 0.3s ease",
+      }}
+    >
       <Stack direction="row" justifyContent="space-evenly">
         <IconButton
           id="call-settings-button"
@@ -173,6 +206,48 @@ const Controls: FC<ControlsProps> = ({
             ) : (
               <VideocamOffTwoTone fontSize="large" color="disabled" />
             )}
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Share screen" placement="top" arrow>
+          <IconButton size="large" onClick={handleOpenScreenShareOptions}>
+            {isSharingScreen ? (
+              <StopScreenShareTwoTone
+                fontSize="large"
+                sx={{ color: theme.palette.secondary.light }}
+              />
+            ) : (
+              <ScreenShareTwoTone
+                fontSize="large"
+                sx={{ color: theme.palette.secondary.light }}
+              />
+            )}
+          </IconButton>
+        </Tooltip>
+        <Tooltip
+          title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+          placement="top"
+          arrow
+        >
+          <IconButton size="large" onClick={toggleFullscreen}>
+            {isFullscreen ? (
+              <FullscreenExitTwoTone
+                fontSize="large"
+                sx={{ color: theme.palette.secondary.light }}
+              />
+            ) : (
+              <FullscreenTwoTone
+                fontSize="large"
+                sx={{ color: theme.palette.secondary.light }}
+              />
+            )}
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Exit classroom" placement="top" arrow>
+          <IconButton size="large" onClick={handleExitClassroom}>
+            <ExitToAppTwoTone
+              fontSize="large"
+              sx={{ color: theme.palette.secondary.light }}
+            />
           </IconButton>
         </Tooltip>
         <Button

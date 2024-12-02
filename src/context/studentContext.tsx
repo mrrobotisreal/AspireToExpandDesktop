@@ -26,12 +26,23 @@ interface StudentInfo {
   // TODO: Add more fields
 }
 
+interface UpcomingClass {
+  dateAndTime: string;
+  preferredName: string;
+  profilePicURL: string;
+  room: string;
+  teacherID: string;
+  subject: string;
+}
+
 interface StudentInfoContext {
   info: StudentInfo;
   getInfo: () => StudentInfo | null;
   removeInfo: () => void;
   updateInfo: (newInfo: StudentInfo) => void;
   updateInfoOnServer: (newInfo: UpdateStudentInfoRequest) => Promise<void>;
+  classes: UpcomingClass[];
+  fetchClasses: () => Promise<void>;
 }
 
 const getInfo = () => {
@@ -48,6 +59,8 @@ const StudentContext = createContext<StudentInfoContext>({
   removeInfo,
   updateInfo: () => {},
   updateInfoOnServer: async () => {},
+  classes: [],
+  fetchClasses: async () => {},
 });
 
 export const useStudentContext = () =>
@@ -89,10 +102,43 @@ interface StudentProviderProps {
 
 const StudentProvider: FC<StudentProviderProps> = ({ children }) => {
   const [studentInfo, setStudentInfo] = useState<StudentInfo>({});
+  const [classes, setClasses] = useState<UpcomingClass[]>([]);
 
   const updateInfo = (newInfo: StudentInfo) => {
     setStudentInfo(newInfo);
     localStorage.setItem("studentInfo", JSON.stringify(newInfo));
+  };
+
+  const fetchClasses = async () => {
+    setClasses([
+      {
+        dateAndTime: "2024-12-02T10:00:00",
+        preferredName: "Alina",
+        profilePicURL:
+          "file:///Users/mitchwintrow/Pictures/alinaProfilePic.png",
+        room: "123",
+        teacherID: "alina-123-abc",
+        subject: "Punctuation",
+      },
+      {
+        dateAndTime: "2024-12-02T11:00:00",
+        preferredName: "Alina",
+        profilePicURL:
+          "file:///Users/mitchwintrow/Pictures/alinaProfilePic.png",
+        room: "123",
+        teacherID: "alina-123-abc",
+        subject: "Critical Thinking",
+      },
+      {
+        dateAndTime: "2024-12-02T12:00:00",
+        preferredName: "Alina",
+        profilePicURL:
+          "file:///Users/mitchwintrow/Pictures/alinaProfilePic.png",
+        room: "123",
+        teacherID: "alina-123-abc",
+        subject: "Grammar",
+      },
+    ]);
   };
 
   const values = {
@@ -101,6 +147,8 @@ const StudentProvider: FC<StudentProviderProps> = ({ children }) => {
     removeInfo,
     updateInfo,
     updateInfoOnServer,
+    classes,
+    fetchClasses,
   };
 
   return (

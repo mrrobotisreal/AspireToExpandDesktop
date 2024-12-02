@@ -3,12 +3,13 @@ import { useIntl } from "react-intl";
 
 import { VIDEO_SERVER_URL } from "../../constants/urls";
 import { useStudentContext } from "../../context/studentContext";
-import { useThemeContext } from "../../context/themeContext";
 import useClassroomSocket from "../../hooks/useClassroomSocket";
 import Layout from "../layout/layout";
 
 import Controls from "./classroomComponents/controls";
+import ScreenShareDialog from "./classroomComponents/screenShareDialog";
 import Videos from "./classroomComponents/videos";
+import Classes from "./classroomComponents/classes";
 
 const url = `${VIDEO_SERVER_URL}/?type=student&room=123`;
 
@@ -21,6 +22,10 @@ const Classroom: FC = () => {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const localStream = useRef<MediaStream | null>(null);
+  const [activeVideoTrack, setActiveVideoTrack] =
+    useState<MediaStreamTrack | null>(null);
+  const [activeAudioTrack, setActiveAudioTrack] =
+    useState<MediaStreamTrack | null>(null);
   const [isRemoteStreamActive, setIsRemoteStreamActive] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
@@ -32,10 +37,18 @@ const Classroom: FC = () => {
   const [selectedVideoDeviceLabel, setSelectedVideoDeviceLabel] =
     useState("Default");
   const [selectedVideoDeviceID, setSelectedVideoDeviceID] = useState("");
+  const [areScreenShareOptionsOpen, setAreScreenShareOptionsOpen] =
+    useState(false);
+  const [screenShareOptions, setScreenShareOptions] = useState<
+    Electron.DesktopCapturerSource[]
+  >([]);
+  const [isSharingScreen, setIsSharingScreen] = useState(false);
   const [callSettingsAnchorEl, setCallSettingsAnchorEl] =
     useState<null | HTMLElement>(null);
   const [callSettingsMenuIsOpen, setCallSettingsMenuIsOpen] = useState(false);
   const [isCallStarted, setIsCallStarted] = useState(false);
+  const [isInClassroom, setIsInClassroom] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   peerConnection.onicecandidate = (event) => {
     if (event.candidate) {
@@ -67,20 +80,98 @@ const Classroom: FC = () => {
   };
 
   const toggleVideo = () => {
-    const videoTrack = localStream.current?.getVideoTracks()[0];
-
-    if (videoTrack) {
-      videoTrack.enabled = !videoTrack.enabled;
-      setIsVideoOn(videoTrack.enabled);
+    if (activeVideoTrack) {
+      activeVideoTrack.enabled = !activeVideoTrack.enabled;
+      setIsVideoOn(activeVideoTrack.enabled);
     }
   };
   const toggleAudio = () => {
-    const audioTrack = localStream.current?.getAudioTracks()[0];
-
-    if (audioTrack) {
-      audioTrack.enabled = !audioTrack.enabled;
-      setIsMicOn(audioTrack.enabled);
+    if (activeAudioTrack) {
+      activeAudioTrack.enabled = !activeAudioTrack.enabled;
+      setIsMicOn(activeAudioTrack.enabled);
     }
+  };
+
+  const startScreenShare = async (source: Electron.DesktopCapturerSource) => {
+    try {
+      const videoConstraints: MediaTrackConstraints = {
+        // @ts-ignore
+        mandatory: {
+          chromeMediaSource: "desktop",
+          chromeMediaSourceId: source.id,
+        },
+      };
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: videoConstraints,
+      });
+      const videoTrack = stream.getVideoTracks()[0];
+      setActiveVideoTrack(videoTrack);
+
+      const senders = peerConnection.getSenders();
+      const videoSender = senders.find(
+        (sender) => sender.track?.kind === "video"
+      );
+
+      if (videoSender) {
+        videoSender.replaceTrack(videoTrack);
+      } else {
+        peerConnection.addTrack(videoTrack, stream);
+      }
+
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+
+      videoTrack.onended = () => {
+        stopScreenShare();
+      };
+    } catch (error) {
+      console.error("Error starting screen share: ", error);
+    }
+  };
+  const stopScreenShare = async () => {
+    try {
+      const cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: selectedVideoDeviceID } },
+        audio: { deviceId: { exact: selectedAudioDeviceID } },
+      });
+      const cameraTrack = cameraStream.getVideoTracks()[0];
+      setActiveVideoTrack(cameraTrack);
+
+      const senders = peerConnection.getSenders();
+      const sender = senders.find((sender) => sender.track?.kind === "video");
+      if (sender) {
+        await sender.replaceTrack(cameraTrack);
+      }
+
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = cameraStream;
+      }
+    } catch (error) {
+      console.error("Error stopping screen share: ", error);
+    }
+  };
+
+  const handleOpenScreenShareOptions = async () => {
+    if (isSharingScreen) {
+      await stopScreenShare();
+      setIsSharingScreen(false);
+    } else {
+      const options = await window.electronAPI.getMediaSources();
+      setScreenShareOptions(options || []);
+      setAreScreenShareOptionsOpen(true);
+    }
+  };
+  const handleCloseScreenShareOptions = () => {
+    setAreScreenShareOptionsOpen(false);
+  };
+  const handleSelectScreenShareSource = async (
+    source: Electron.DesktopCapturerSource
+  ) => {
+    await startScreenShare(source);
+    setIsSharingScreen(true);
+    setAreScreenShareOptionsOpen(false);
   };
 
   const handleSelectVideoDevice = async (deviceId: string, label: string) => {
@@ -93,6 +184,8 @@ const Classroom: FC = () => {
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
+      const videoTrack = stream.getVideoTracks()[0];
+      setActiveVideoTrack(videoTrack);
       setSelectedVideoDeviceID(deviceId);
       setSelectedVideoDeviceLabel(label);
     } catch (error) {
@@ -112,6 +205,8 @@ const Classroom: FC = () => {
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
+      const audioTrack = stream.getAudioTracks()[0];
+      setActiveAudioTrack(audioTrack);
       setSelectedAudioDeviceID(deviceId);
       setSelectedAudioDeviceLabel(label);
     } catch (error) {
@@ -151,6 +246,10 @@ const Classroom: FC = () => {
       stream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, stream);
       });
+      const videoTrack = stream.getVideoTracks()[0];
+      setActiveVideoTrack(videoTrack);
+      const audioTrack = stream.getAudioTracks()[0];
+      setActiveAudioTrack(audioTrack);
       setIsMicOn(true);
       setIsVideoOn(true);
       await fetchDevices();
@@ -177,6 +276,30 @@ const Classroom: FC = () => {
     }
   };
 
+  const handleEnterClassroom = () => {
+    setIsInClassroom(true);
+    // TODO: add other room logic here
+  };
+
+  const handleExitClassroom = () => {
+    setIsInClassroom(false);
+    // TODO: add other room logic here
+  };
+
+  const handleEnterFullscreen = () => {
+    setIsFullscreen(true);
+  };
+  const handleExitFullscreen = () => {
+    setIsFullscreen(false);
+  };
+  const toggleFullscreen = () => {
+    if (isFullscreen) {
+      handleExitFullscreen();
+    } else {
+      handleEnterFullscreen();
+    }
+  };
+
   useEffect(() => {
     startMedia();
   }, []);
@@ -192,30 +315,52 @@ const Classroom: FC = () => {
   }, []);
 
   return (
-    <Layout title={intl.formatMessage({ id: "common_classroom" })}>
-      <Videos
-        localVideoRef={localVideoRef}
-        remoteVideoRef={remoteVideoRef}
-        isRemoteStreamActive={isRemoteStreamActive}
-      />
-      <Controls
-        isCallStarted={isCallStarted}
-        handleOpenCallSettingsMenu={handleOpenCallSettingsMenu}
-        handleCloseCallSettingsMenu={handleCloseCallSettingsMenu}
-        callSettingsAnchorEl={callSettingsAnchorEl}
-        callSettingsMenuIsOpen={callSettingsMenuIsOpen}
-        handleSelectVideoDevice={handleSelectVideoDevice}
-        toggleVideo={toggleVideo}
-        isVideoOn={isVideoOn}
-        videoDevices={videoDevices}
-        selectedVideoDeviceLabel={selectedVideoDeviceLabel}
-        handleSelectAudioDevice={handleSelectAudioDevice}
-        toggleAudio={toggleAudio}
-        isMicOn={isMicOn}
-        audioDevices={audioDevices}
-        selectedAudioDeviceLabel={selectedAudioDeviceLabel}
-        joinClass={joinClass}
-      />
+    <Layout
+      isFullscreen={isFullscreen}
+      title={intl.formatMessage({ id: "common_classroom" })}
+    >
+      {!isInClassroom && (
+        <Classes handleEnterClassroom={handleEnterClassroom} />
+      )}
+      <>
+        <Videos
+          isInClassroom={isInClassroom}
+          localVideoRef={localVideoRef}
+          remoteVideoRef={remoteVideoRef}
+          isRemoteStreamActive={isRemoteStreamActive}
+          isFullscreen={isFullscreen}
+        />
+        <Controls
+          isInClassroom={isInClassroom}
+          handleExitClassroom={handleExitClassroom}
+          isCallStarted={isCallStarted}
+          handleOpenCallSettingsMenu={handleOpenCallSettingsMenu}
+          handleCloseCallSettingsMenu={handleCloseCallSettingsMenu}
+          callSettingsAnchorEl={callSettingsAnchorEl}
+          callSettingsMenuIsOpen={callSettingsMenuIsOpen}
+          handleSelectVideoDevice={handleSelectVideoDevice}
+          toggleVideo={toggleVideo}
+          isVideoOn={isVideoOn}
+          videoDevices={videoDevices}
+          selectedVideoDeviceLabel={selectedVideoDeviceLabel}
+          handleSelectAudioDevice={handleSelectAudioDevice}
+          toggleAudio={toggleAudio}
+          isMicOn={isMicOn}
+          audioDevices={audioDevices}
+          selectedAudioDeviceLabel={selectedAudioDeviceLabel}
+          handleOpenScreenShareOptions={handleOpenScreenShareOptions}
+          isSharingScreen={isSharingScreen}
+          joinClass={joinClass}
+          isFullscreen={isFullscreen}
+          toggleFullscreen={toggleFullscreen}
+        />
+        <ScreenShareDialog
+          areScreenShareOptionsOpen={areScreenShareOptionsOpen}
+          handleCloseScreenShareOptions={handleCloseScreenShareOptions}
+          screenShareOptions={screenShareOptions}
+          handleSelectScreenShareSource={handleSelectScreenShareSource}
+        />
+      </>
     </Layout>
   );
 };
