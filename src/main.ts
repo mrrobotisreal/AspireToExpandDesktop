@@ -1,12 +1,29 @@
-import { app, BrowserWindow, ipcMain, dialog, desktopCapturer } from "electron";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  desktopCapturer,
+  shell,
+} from "electron";
 import path from "path";
 import WebSocket from "ws";
 import fs from "fs";
 import { generateKeyPairSync } from "crypto";
+import { google } from "googleapis";
 import "dotenv/config";
 
 let mainWindow: BrowserWindow | null = null;
 let socket: WebSocket | null = null;
+
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const REDIRECT_URI = "http://localhost/oauth2callback";
+const oauth2Client = new google.auth.OAuth2(
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REDIRECT_URI
+);
 
 function connectChatWebSocket(studentId: string) {
   socket = new WebSocket(
@@ -143,6 +160,50 @@ function createWindow(): void {
       return inputSources;
     }
   );
+  ipcMain.handle("login-with-google", async () => {
+    const authUrl = oauth2Client.generateAuthUrl({
+      access_type: "offline",
+      // scope: ["https://www.googleapis.com/auth/userinfo.email"],
+      scope: ["openid", "profile", "email"],
+    });
+
+    // shell.openExternal(authUrl);
+
+    return new Promise((resolve, reject) => {
+      const authWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+          nodeIntegration: false,
+        },
+      });
+
+      authWindow.loadURL(authUrl);
+
+      authWindow.webContents.on("will-redirect", async (_, url) => {
+        if (url.startsWith(REDIRECT_URI)) {
+          const params = new URL(url).searchParams;
+          console.log("Received auth code:", params.get("code"));
+          const code = params.get("code");
+          authWindow.close();
+
+          try {
+            const { tokens } = await oauth2Client.getToken(code!);
+            console.log("Received tokens:", JSON.stringify(tokens, null, 2));
+            oauth2Client.setCredentials(tokens);
+            resolve(tokens);
+          } catch (error) {
+            console.error("Error getting tokens:", error);
+            reject(error);
+          }
+        }
+      });
+
+      // authWindow.on("closed", () => {
+      //   reject(new Error("User closed the window before login completed"));
+      // });
+    });
+  });
 }
 
 app.whenReady().then(() => createWindow());
