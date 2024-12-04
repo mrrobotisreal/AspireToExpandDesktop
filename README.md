@@ -34,8 +34,7 @@ This app provides students with the ability manage their data, securely pay for 
 - 📂 Integration with Google Drive/Docs _(Under development)_
 - ㊙️ Integration with Google Translate _(Under development)_
 - 🤖 Integration with ChatGPT _(Under development)_
-- 🎮 Gamification for students
-- 🧍‍♂️🧍‍♀️ Student segmentation _(Under development)_
+- 🎮 Gamification
 - 🔔 Push notifications _(Under development)_
 
 ## Demo
