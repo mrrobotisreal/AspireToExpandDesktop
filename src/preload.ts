@@ -29,6 +29,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   selectChatAttachment: () => ipcRenderer.invoke("select-chat-attachment"),
   getMediaSources: () => ipcRenderer.invoke("get-media-sources"),
   loginWithGoogle: () => ipcRenderer.invoke("login-with-google"),
+  getStripePublishableKey: () => process.env.STRIPE_PUBLISHABLE_KEY,
+  getPaymentServerURL: () => process.env.PAYMENT_SERVER_URL,
 });
 
 window.addEventListener("DOMContentLoaded", () => {

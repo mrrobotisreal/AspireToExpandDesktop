@@ -23,6 +23,8 @@ interface StudentInfo {
   profilePictureURL?: string;
   profilePicturePath?: string;
   timeZone?: string;
+  lessonsRemaining?: number;
+  lessonsCompleted?: number;
   // TODO: Add more fields
 }
 
@@ -67,8 +69,8 @@ export const useStudentContext = () =>
   useContext<StudentInfoContext>(StudentContext);
 
 interface UpdateStudentInfoRequest {
-  student_id?: string;
-  email_address: string;
+  student_id: string;
+  email_address?: string;
   preferred_name?: string;
   preferred_language?: string;
   theme_mode?: ThemeMode;
@@ -77,6 +79,8 @@ interface UpdateStudentInfoRequest {
   profile_picture_path?: string;
   time_zone?: string;
   public_key?: string;
+  lessons_remaining?: number;
+  lessons_completed?: number;
 }
 
 const updateInfoOnServer = async (newInfo: UpdateStudentInfoRequest) => {

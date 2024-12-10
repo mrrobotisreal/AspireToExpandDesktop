@@ -36,7 +36,13 @@ const Chat: FC = () => {
 
   const getNameAndID = () => {
     if (selectedChat && allChats.length) {
-      const chat = allChats.find((chat) => chat.chatID === selectedChat)!;
+      const chat = allChats.find((chat) => chat.chatID === selectedChat);
+      if (!chat) {
+        return {
+          name: "",
+          toID: "",
+        };
+      }
       return {
         name:
           chat.to === info.preferredName

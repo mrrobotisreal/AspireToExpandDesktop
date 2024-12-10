@@ -22,6 +22,8 @@ export interface ElectronAPI {
   selectChatAttachment: () => Promise<string>;
   getMediaSources: () => Promise<Electron.DesktopCapturerSource[]>;
   loginWithGoogle: () => Promise<Credentials>;
+  getStripePublishableKey: () => string;
+  getPaymentServerURL: () => string;
 }
 
 declare global {

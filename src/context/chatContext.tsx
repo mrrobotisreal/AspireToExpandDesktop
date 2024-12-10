@@ -108,6 +108,7 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setChatsAreLoading(false);
         return;
       }
+      console.log("Fetched chats:", data);
 
       const sortedData = data.sort((a: Chat, b: Chat) => {
         if (a.mostRecentMessage.time > b.mostRecentMessage.time) return -1;
@@ -154,14 +155,32 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  const sendMessage = (message: ChatMessage) => {
+  const sendMessage = async (message: ChatMessage) => {
     const chatId = getChatID(message);
     const updatedMessages = [...messages, message];
     const key = `messages_${chatId}_1`; // TODO: Implement pagination
 
-    window.electronAPI.sendMessage(message);
-    setMessages(updatedMessages);
-    localStorage.setItem(key, JSON.stringify(updatedMessages));
+    // window.electronAPI.sendMessage(message); // TODO: fix websockets later
+    try {
+      const response = await fetch(`${HTTP_CHAT_SERVER_URL}/message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=UTF-8" },
+        body: JSON.stringify(message),
+      });
+      if (response.status === 200) {
+        console.log("Message sent successfully");
+        setMessages(updatedMessages);
+        localStorage.setItem(key, JSON.stringify(updatedMessages));
+      } else {
+        console.error(
+          "Issue sending message:",
+          response.status,
+          response.statusText
+        );
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   const fetchAllStudents = async () => {

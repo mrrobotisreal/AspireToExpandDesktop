@@ -146,6 +146,7 @@ const Login: FC = () => {
             const keyPair = await generateKeyPair();
             if (keyPair) {
               updateInfoOnServer({
+                student_id: body.student_id,
                 email_address: emailAddress,
                 public_key: keyPair.publicKey,
               });
