@@ -74,7 +74,7 @@ const ChatDialog: FC<ChatDialogProps> = ({
             setSelectedStudent(newValue)
           }
           isOptionEqualToValue={(option, value) => option === value}
-          getOptionLabel={(option: Student) => option.preferredname}
+          getOptionLabel={(option: Student) => option.preferred_name}
           options={allStudents}
           loading={studentsAreLoading}
           renderInput={(params) => (
@@ -116,8 +116,8 @@ const ChatDialog: FC<ChatDialogProps> = ({
         <Button
           onClick={() =>
             handleStartNewChat(
-              selectedStudent?.preferredname!,
-              selectedStudent?.studentid!
+              selectedStudent?.preferred_name!,
+              selectedStudent?.student_id!
             )
           }
           variant="contained"

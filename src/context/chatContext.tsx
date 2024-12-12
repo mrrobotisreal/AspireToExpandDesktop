@@ -52,9 +52,9 @@ export const createChatID = (
 };
 
 export interface Student {
-  studentid: string;
-  preferredname: string;
-  emailaddress: string;
+  student_id: string;
+  preferred_name: string;
+  email_address: string;
 }
 
 interface ChatContextProps {
@@ -186,16 +186,17 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const fetchAllStudents = async () => {
     try {
       setStudentsAreLoading(true);
-      const response = await fetch(`${MAIN_SERVER_URL}/students`);
+      const response = await fetch(
+        `${MAIN_SERVER_URL}/students?page=1&limit=100`
+      ); // TODO: Implement pagination
       const data = await response.json();
 
-      // TODO: Implement pagination
-      setStudents(data);
+      setStudents(data.students);
 
-      localStorage.setItem("students", JSON.stringify(data));
+      localStorage.setItem("students", JSON.stringify(data.students));
 
-      const filteredStudents = data.filter(
-        (student: Student) => student.preferredname !== info.preferredName
+      const filteredStudents = data.students.filter(
+        (student: Student) => student.preferred_name !== info.preferred_name
       );
       await sleep(1500); // TODO: remove this; for testing only right now
       setStudentsAreLoading(false);

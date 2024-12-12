@@ -49,7 +49,7 @@ const ChatWindow: FC<ChatWindowProps> = ({
               display: "flex",
               flexDirection: "column",
               alignItems:
-                msg.from === info.preferredName! ? "flex-end" : "flex-start",
+                msg.from === info.preferred_name! ? "flex-end" : "flex-start",
               mb: 1,
               width: "100%",
             }}
@@ -60,7 +60,7 @@ const ChatWindow: FC<ChatWindowProps> = ({
                 borderRadius: "6px",
                 maxWidth: "50%",
                 backgroundColor:
-                  msg.from === info.preferredName!
+                  msg.from === info.preferred_name!
                     ? theme.palette.background.default
                     : theme.palette.primary.light,
               }}

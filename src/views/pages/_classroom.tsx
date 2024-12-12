@@ -24,8 +24,8 @@ const Classroom: FC = () => {
   const remoteStream3 = useRef<MediaStream | null>(null);
   const [participants, setParticipants] = useState<VideoRefObject[]>([
     {
-      id: info.studentId || "",
-      label: info.preferredName || "",
+      id: info.student_id || "",
+      label: info.preferred_name || "",
       ref: localVideoRef,
     },
   ]);

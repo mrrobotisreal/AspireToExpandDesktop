@@ -62,17 +62,17 @@ const Login: FC = () => {
         if (response.status === 200) {
           const body = await response.json();
           updateInfo({
-            firstName: body.first_name,
-            lastName: body.last_name,
-            emailAddress: body.email_address,
-            themeMode: "light",
-            fontStyle: "Bauhaus",
+            first_name: body.first_name,
+            last_name: body.last_name,
+            email_address: body.email_address,
+            theme_mode: "light",
+            font_style: "Bauhaus",
           });
           navigate("/student-form", {
             state: {
-              firstName: body.first_name,
-              lastName: body.last_name,
-              email: body.email_address,
+              first_name: body.first_name,
+              last_name: body.last_name,
+              email_address: body.email_address,
             },
           });
         } else {
@@ -109,20 +109,24 @@ const Login: FC = () => {
 
         if (response.status === 200) {
           const body = await response.json();
+          console.log("Login response:", body);
 
           updateInfo({
-            studentId: body.student_id,
-            firstName: body.first_name,
-            preferredName: body.preferred_name,
-            lastName: body.last_name,
-            emailAddress: body.email_address,
-            nativeLanguage: body.native_language,
-            preferredLanguage: body.preferred_language,
-            themeMode: body.theme_mode,
-            fontStyle: body.font_style,
-            profilePictureURL: body.profile_picture_url,
-            profilePicturePath: body.profile_picture_path,
-            timeZone: body.time_zone,
+            student_id: body.student_id,
+            first_name: body.first_name,
+            preferred_name: body.preferred_name,
+            last_name: body.last_name,
+            email_address: body.email_address,
+            native_language: body.native_language,
+            preferred_language: body.preferred_language,
+            student_since: body.student_since,
+            theme_mode: body.theme_mode,
+            font_style: body.font_style,
+            profile_picture_url: body.profile_picture_url,
+            profile_picture_path: body.profile_picture_path,
+            time_zone: body.time_zone,
+            lessons_remaining: body.lessons_remaining,
+            lessons_completed: body.lessons_completed,
           });
           toggleThemeMode(
             !body.theme_mode || body.theme_mode === ""
@@ -189,21 +193,25 @@ const Login: FC = () => {
       }),
     });
     const resData = await response.json();
+    console.log("Google login response:", resData);
 
     if (response.status === 200) {
       updateInfo({
-        studentId: resData.student_id,
-        firstName: resData.first_name,
-        preferredName: resData.preferred_name,
-        lastName: resData.last_name,
-        emailAddress: resData.email_address,
-        nativeLanguage: resData.native_language,
-        preferredLanguage: resData.preferred_language,
-        themeMode: resData.theme_mode,
-        fontStyle: resData.font_style,
-        profilePictureURL: resData.profile_picture_url,
-        profilePicturePath: resData.profile_picture_path,
-        timeZone: resData.time_zone,
+        student_id: resData.student_id,
+        first_name: resData.first_name,
+        preferred_name: resData.preferred_name,
+        last_name: resData.last_name,
+        email_address: resData.email_address,
+        native_language: resData.native_language,
+        preferred_language: resData.preferred_language,
+        student_since: resData.student_since,
+        theme_mode: resData.theme_mode,
+        font_style: resData.font_style,
+        profile_picture_url: resData.profile_picture_url,
+        profile_picture_path: resData.profile_picture_path,
+        time_zone: resData.time_zone,
+        lessons_remaining: resData.lessons_remaining,
+        lessons_completed: resData.lessons_completed,
       });
       toggleThemeMode(
         !resData.theme_mode || resData.theme_mode === ""
@@ -229,6 +237,7 @@ const Login: FC = () => {
 
   useEffect(() => {
     const storedStudentInfo = getInfo();
+    console.log("Stored student info: ", storedStudentInfo);
 
     if (storedStudentInfo) {
       updateInfo(storedStudentInfo);

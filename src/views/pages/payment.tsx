@@ -54,13 +54,13 @@ const Payment: FC = () => {
       } else {
         numLessonsAdded = 12;
       }
-      const newLessonsRemaining = info.lessonsRemaining! + numLessonsAdded;
+      const newLessonsRemaining = info.lessons_remaining! + numLessonsAdded;
       updateInfo({
         ...info,
-        lessonsRemaining: newLessonsRemaining,
+        lessons_remaining: newLessonsRemaining,
       });
       updateInfoOnServer({
-        student_id: info.studentId!,
+        student_id: info.student_id!,
         lessons_remaining: newLessonsRemaining,
       });
       navigate("/profile");

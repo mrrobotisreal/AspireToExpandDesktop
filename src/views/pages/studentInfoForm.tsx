@@ -42,15 +42,15 @@ const Transition = React.forwardRef(function Transition(
 const StudentInfoForm: FC = () => {
   const intl = useIntl();
   const { state } = useLocation();
-  const { firstName, lastName, email } = state;
+  const { first_name, last_name, email_address } = state;
   const { theme, regularFont, heavyFont } = useThemeContext();
   const { generateKeyPair } = useEncryption();
   const [nativeLanguage, setNativeLanguage] = useState("uk");
   const [preferredLanguage, setPreferredLanguage] = useState("en");
-  const [enteredFirstName, setEnteredFirstName] = useState(firstName);
-  const [enteredPreferredName, setEnteredPreferredName] = useState(firstName);
-  const [enteredLastName, setEnteredLastName] = useState(lastName);
-  const [emailAddress, setEmailAddress] = useState(email);
+  const [enteredFirstName, setEnteredFirstName] = useState(first_name);
+  const [enteredPreferredName, setEnteredPreferredName] = useState(first_name);
+  const [enteredLastName, setEnteredLastName] = useState(last_name);
+  const [emailAddress, setEmailAddress] = useState(email_address);
   const [isEmailAddressValid, setIsEmailAddressValid] = useState(true);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
@@ -192,7 +192,7 @@ const StudentInfoForm: FC = () => {
           last_name: enteredLastName,
           email_address: emailAddress,
           password: shortenedHash,
-          theme_mode: "system",
+          theme_mode: "light",
           font_style: "Bauhaus",
           public_key: keyPair.publicKey,
         }),
@@ -223,7 +223,7 @@ const StudentInfoForm: FC = () => {
   return (
     <Layout title={intl.formatMessage({ id: "studentInfoForm_title" })}>
       <Text variant="h4" fontFamily={heavyFont} color="textPrimary">
-        {intl.formatMessage({ id: "common_welcome" }, { firstName })}
+        {intl.formatMessage({ id: "common_welcome" }, { first_name })}
       </Text>
       <Text variant="body1" fontFamily={regularFont} color="textPrimary">
         {intl.formatMessage({ id: "studentInfoForm_description" })}

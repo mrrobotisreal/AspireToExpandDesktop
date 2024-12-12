@@ -129,7 +129,7 @@ const ChatList: FC<ChatListProps> = ({
                           textOverflow="ellipsis"
                           noWrap
                         >
-                          {chat.to === info.preferredName
+                          {chat.to === info.preferred_name
                             ? chat.mostRecentMessage.from
                             : chat.to}
                         </Text>

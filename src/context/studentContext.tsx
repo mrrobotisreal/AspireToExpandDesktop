@@ -10,21 +10,40 @@ import { AppFontStyle } from "../constants/fonts";
 import { MAIN_SERVER_URL } from "../constants/urls";
 import { ThemeMode } from "./themeContext";
 
+interface ServerStudentInfo {
+  student_id: string;
+  first_name: string;
+  preferred_name: string;
+  last_name: string;
+  email_address: string;
+  native_language: string;
+  preferred_language: string;
+  student_since: string;
+  theme_mode: ThemeMode;
+  profile_picture_url: string;
+  profile_picture_path: string;
+  font_style: AppFontStyle;
+  time_zone: string;
+  lessons_remaining: number;
+  lessons_completed: number;
+}
+
 interface StudentInfo {
-  studentId?: string;
-  firstName?: string;
-  preferredName?: string;
-  lastName?: string;
-  emailAddress?: string;
-  nativeLanguage?: string;
-  preferredLanguage?: string;
-  themeMode?: ThemeMode;
-  fontStyle?: AppFontStyle;
-  profilePictureURL?: string;
-  profilePicturePath?: string;
-  timeZone?: string;
-  lessonsRemaining?: number;
-  lessonsCompleted?: number;
+  student_id?: string;
+  first_name?: string;
+  preferred_name?: string;
+  last_name?: string;
+  email_address?: string;
+  native_language?: string;
+  preferred_language?: string;
+  student_since?: string;
+  theme_mode?: ThemeMode;
+  font_style?: AppFontStyle;
+  profile_picture_url?: string;
+  profile_picture_path?: string;
+  time_zone?: string;
+  lessons_remaining?: number;
+  lessons_completed?: number;
   // TODO: Add more fields
 }
 
@@ -40,6 +59,7 @@ interface UpcomingClass {
 interface StudentInfoContext {
   info: StudentInfo;
   getInfo: () => StudentInfo | null;
+  getInfoFromServer: (studentID: string) => Promise<ServerStudentInfo>;
   removeInfo: () => void;
   updateInfo: (newInfo: StudentInfo) => void;
   updateInfoOnServer: (newInfo: UpdateStudentInfoRequest) => Promise<void>;
@@ -55,9 +75,27 @@ const getInfo = () => {
 
 const removeInfo = () => localStorage.removeItem("studentInfo");
 
+const getInfoFromServer = async (
+  studentID: string
+): Promise<ServerStudentInfo> => {
+  try {
+    const response = await fetch(
+      `${MAIN_SERVER_URL}/student?studentID=${studentID}`
+    );
+    const data = await response.json();
+    const { student } = data;
+
+    return student;
+  } catch (error) {
+    console.error("Error fetching student info:", error); // TODO: localize
+    throw error;
+  }
+};
+
 const StudentContext = createContext<StudentInfoContext>({
   info: {},
   getInfo,
+  getInfoFromServer,
   removeInfo,
   updateInfo: () => {},
   updateInfoOnServer: async () => {},
@@ -108,9 +146,33 @@ const StudentProvider: FC<StudentProviderProps> = ({ children }) => {
   const [studentInfo, setStudentInfo] = useState<StudentInfo>({});
   const [classes, setClasses] = useState<UpcomingClass[]>([]);
 
-  const updateInfo = (newInfo: StudentInfo) => {
-    setStudentInfo(newInfo);
-    localStorage.setItem("studentInfo", JSON.stringify(newInfo));
+  const checkIsInfoInSyncWithServer = (
+    newInfo: StudentInfo,
+    serverInfo: ServerStudentInfo
+  ) => {
+    const newInfoKeys = Object.keys(newInfo);
+    const serverInfoKeys = Object.keys(serverInfo);
+
+    if (newInfoKeys.length !== serverInfoKeys.length) return false;
+
+    for (const key of serverInfoKeys) {
+      // @ts-ignore
+      if (newInfo[key] !== serverInfo[key]) return false;
+    }
+
+    return true;
+  };
+
+  const updateInfo = async (newInfo: StudentInfo) => {
+    const infoOnServer = await getInfoFromServer(newInfo.student_id!);
+    const isInfoInSync = checkIsInfoInSyncWithServer(newInfo, infoOnServer);
+    if (isInfoInSync) {
+      setStudentInfo(newInfo);
+      localStorage.setItem("studentInfo", JSON.stringify(newInfo));
+    } else {
+      setStudentInfo(infoOnServer);
+      localStorage.setItem("studentInfo", JSON.stringify(infoOnServer));
+    }
   };
 
   const fetchClasses = async () => {
@@ -148,6 +210,7 @@ const StudentProvider: FC<StudentProviderProps> = ({ children }) => {
   const values = {
     info: studentInfo,
     getInfo,
+    getInfoFromServer,
     removeInfo,
     updateInfo,
     updateInfoOnServer,

@@ -45,11 +45,11 @@ const Chat: FC = () => {
       }
       return {
         name:
-          chat.to === info.preferredName
+          chat.to === info.preferred_name
             ? chat.mostRecentMessage.from
             : chat.to,
         toID:
-          chat.toID === info.studentId
+          chat.toID === info.student_id
             ? chat.mostRecentMessage.fromID
             : chat.toID,
       };
@@ -74,8 +74,8 @@ const Chat: FC = () => {
   const handleClickSend = (name: string, toID: string) => {
     console.log("handling send...");
     const message = {
-      from: info.preferredName!,
-      fromID: info.studentId!,
+      from: info.preferred_name!,
+      fromID: info.student_id!,
       to: name,
       toID: toID,
       content: textMessage.trim(),
@@ -90,7 +90,7 @@ const Chat: FC = () => {
   const handleStartNewChat = (name: string, toID: string) => {
     setName(name);
     setToID(toID);
-    const chatID = createChatID(info.studentId!, toID);
+    const chatID = createChatID(info.student_id!, toID);
     setSelectedChat(chatID);
     setAllChats([
       {
@@ -98,8 +98,8 @@ const Chat: FC = () => {
         to: name,
         toID,
         mostRecentMessage: {
-          from: info.preferredName!,
-          fromID: info.studentId!,
+          from: info.preferred_name!,
+          fromID: info.student_id!,
           to: name,
           toID,
           content: "",
@@ -122,10 +122,10 @@ const Chat: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (info.studentId && selectedChat) {
+    if (info.student_id && selectedChat) {
       fetchMessages(selectedChat!);
-    } else if (info.studentId) {
-      fetchChats(info.studentId!);
+    } else if (info.student_id) {
+      fetchChats(info.student_id!);
     }
     getNameAndID();
   }, [info, selectedChat]);

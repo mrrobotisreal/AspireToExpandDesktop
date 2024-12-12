@@ -30,10 +30,10 @@ const Settings: FC = () => {
   } = useThemeContext();
   const { info, getInfo, updateInfo, updateInfoOnServer } = useStudentContext();
   const [selectedThemeMode, setSelectedThemeMode] = useState<ThemeMode>(
-    info.themeMode ?? "light"
+    info.theme_mode ?? "light"
   );
   const [selectedFontFamily, setSelectedFontFamily] = useState<AppFontStyle>(
-    info.fontStyle ?? "Bauhaus"
+    info.font_style ?? "Bauhaus"
   );
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(
@@ -55,19 +55,19 @@ const Settings: FC = () => {
   };
 
   const handleUpdateSettingsOnServer = async () => {
-    if (!info.studentId || info.studentId === "") {
+    if (!info.student_id || info.student_id === "") {
       console.error("Student ID is required to update settings on server");
       return;
     }
-    if (!info.emailAddress || info.emailAddress === "") {
+    if (!info.email_address || info.email_address === "") {
       console.error("Email address is required to update settings on server"); // TODO: localize
       return;
     }
 
     try {
       await updateInfoOnServer({
-        student_id: info.studentId,
-        email_address: info.emailAddress,
+        student_id: info.student_id,
+        email_address: info.email_address,
         theme_mode: selectedThemeMode,
         font_style: selectedFontFamily,
       });
@@ -79,8 +79,8 @@ const Settings: FC = () => {
   const handleUpdateSettings = () => {
     updateInfo({
       ...info,
-      themeMode: selectedThemeMode,
-      fontStyle: selectedFontFamily,
+      theme_mode: selectedThemeMode,
+      font_style: selectedFontFamily,
     });
     handleUpdateSettingsOnServer();
     setToastIsOpen(true);

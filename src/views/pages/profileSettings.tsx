@@ -36,26 +36,26 @@ import { LessonPackage, lessonPackages } from "../../constants/prices";
 const ProfileSettings: FC = () => {
   const intl = useIntl();
   const { info, getInfo, updateInfo, updateInfoOnServer } = useStudentContext();
-  // const { studentInfo } = useGetStudentInfo(info.studentId!);
+  // const { studentInfo } = useGetStudentInfo(info.student_id!);
   const { changeLocale } = useMessagesContext();
   const { theme, regularFont, heavyFont } = useThemeContext();
   const { selectedPackageId, changeSelectedPackageId } = usePaymentContext();
   const navigate = useNavigate();
   const { uploadImage } = useUploadImage();
   const [profilePictureURL, setProfilePictureURL] = useState(
-    info.profilePictureURL ?? ""
+    info.profile_picture_url ?? ""
   );
   const [profilePicturePath, setProfilePicturePath] = useState(
-    info.profilePicturePath ?? ""
+    info.profile_picture_path ?? ""
   );
   const [preferredLanguage, setPreferredLanguage] = useState(
-    info.preferredLanguage ?? "en"
+    info.preferred_language ?? "en"
   );
   const [avatarSrc, setAvatarSrc] = useState(
-    info.profilePictureURL ?? info.profilePicturePath ?? ""
+    info.profile_picture_url ?? info.profile_picture_path ?? ""
   );
   const [timeZone, setTimeZone] = useState(
-    info.timeZone ?? "timeZone_us_pacific"
+    info.time_zone ?? "timeZone_us_pacific"
   );
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(
@@ -72,7 +72,7 @@ const ProfileSettings: FC = () => {
       price: 114,
     });
   const [lessonsRemaining, setLessonsRemaining] = useState(
-    info.lessonsRemaining || 0
+    info.lessons_remaining || 0
   );
 
   const handleChooseImage = async () => {
@@ -87,7 +87,7 @@ const ProfileSettings: FC = () => {
         return;
       }
 
-      if (!info.studentId || info.studentId === "") {
+      if (!info.student_id || info.student_id === "") {
         console.error("Student ID is required to upload image");
         return;
       }
@@ -96,7 +96,7 @@ const ProfileSettings: FC = () => {
         const uploadedImage = await uploadImage(
           filePath,
           fileExtension,
-          info.studentId
+          info.student_id
         );
 
         if (uploadedImage) {
@@ -114,19 +114,19 @@ const ProfileSettings: FC = () => {
   };
 
   const handleUpdateSettingsOnServer = async () => {
-    if (!info.studentId || info.studentId === "") {
+    if (!info.student_id || info.student_id === "") {
       console.error("Student ID is required to update settings on server");
       return;
     }
-    if (!info.emailAddress || info.emailAddress === "") {
+    if (!info.email_address || info.email_address === "") {
       console.error("Email address is required to update settings on server");
       return;
     }
 
     try {
       await updateInfoOnServer({
-        student_id: info.studentId,
-        email_address: info.emailAddress,
+        student_id: info.student_id,
+        email_address: info.email_address,
         preferred_language: preferredLanguage,
         profile_picture_url: profilePictureURL,
         profile_picture_path: profilePicturePath,
@@ -137,15 +137,22 @@ const ProfileSettings: FC = () => {
     }
   };
 
-  const handleUpdateSettings = () => {
+  const handleUpdateSettings = async () => {
+    console.log("Student ID: ", info.student_id);
+    const url = `https://aspirewithalina.com:8888/student?studentID=${info.student_id}`;
+    console.log(`URL: ${url}`);
+    const getInfoRes = await fetch(url);
+    const getInfoData = await getInfoRes.json();
+    console.log(`Get info response: ${JSON.stringify(getInfoData, null, 2)}`);
     updateInfo({
       ...info,
-      preferredLanguage,
-      profilePictureURL,
-      profilePicturePath,
-      timeZone,
+      preferred_language: preferredLanguage,
+      profile_picture_url: profilePictureURL,
+      profile_picture_path: profilePicturePath,
+      time_zone: timeZone,
+      lessons_remaining: lessonsRemaining,
     });
-    handleUpdateSettingsOnServer();
+    // handleUpdateSettingsOnServer();
     setToastIsOpen(true);
   };
 
@@ -198,25 +205,25 @@ const ProfileSettings: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (info.profilePictureURL) {
-      setProfilePictureURL(info.profilePictureURL);
+    if (info.profile_picture_url) {
+      setProfilePictureURL(info.profile_picture_url);
     }
 
-    if (info.profilePicturePath) {
-      setProfilePicturePath(info.profilePicturePath);
+    if (info.profile_picture_path) {
+      setProfilePicturePath(info.profile_picture_path);
     }
 
-    if (info.preferredLanguage) {
-      setPreferredLanguage(info.preferredLanguage);
+    if (info.preferred_language) {
+      setPreferredLanguage(info.preferred_language);
     }
 
-    if (info.timeZone) {
-      setTimeZone(info.timeZone);
+    if (info.time_zone) {
+      setTimeZone(info.time_zone);
     }
 
     console.log("Info: ", JSON.stringify(info, null, 2));
-    if (info.lessonsRemaining) {
-      setLessonsRemaining(info.lessonsRemaining);
+    if (info.lessons_remaining) {
+      setLessonsRemaining(info.lessons_remaining);
     }
   }, [info]);
 

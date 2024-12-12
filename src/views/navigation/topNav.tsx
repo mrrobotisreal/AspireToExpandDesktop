@@ -35,10 +35,10 @@ const TopNav: FC<TopNavProps> = ({ handleDrawerOpen, title }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   let avatarSrc = "";
 
-  if (info.profilePictureURL && info.profilePictureURL !== "") {
-    avatarSrc = info.profilePictureURL;
-  } else if (info.profilePicturePath && info.profilePicturePath !== "") {
-    avatarSrc = info.profilePicturePath;
+  if (info.profile_picture_url && info.profile_picture_url !== "") {
+    avatarSrc = info.profile_picture_url;
+  } else if (info.profile_picture_path && info.profile_picture_path !== "") {
+    avatarSrc = info.profile_picture_path;
   }
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
