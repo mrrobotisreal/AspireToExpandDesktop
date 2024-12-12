@@ -14,6 +14,7 @@ import { useMessagesContext } from "../context/messagesContext";
 
 import Login from "./login";
 import Chat from "./pages/chat";
+import _Chat from "./pages/_chat";
 import Classroom from "./pages/classroom";
 import _Classroom from "./pages/_classroom";
 import Home from "./pages/home";
@@ -61,8 +62,10 @@ const App: FC = () => {
                         element={<StudentInfoForm />}
                       />
                       <Route path="/home" element={<Home />} />
+                      {/* <Route path="/classroom" element={<_Classroom />} /> */}
                       <Route path="/classroom" element={<Classroom />} />
-                      <Route path="/chat" element={<Chat />} />
+                      <Route path="/chat" element={<_Chat />} />
+                      {/* <Route path="/chat" element={<Chat />} /> */}
                       <Route path="/payment" element={<Payment />} />
                       {/* <Route path="/lessons" element={} /> */}
                       {/* <Route path="/assignments" element={} /> */}
