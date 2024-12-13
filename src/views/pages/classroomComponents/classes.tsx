@@ -40,7 +40,7 @@ interface ClassesProps {
 const Classes: FC<ClassesProps> = ({ handleEnterClassroom }) => {
   const intl = useIntl();
   const { studentsAreLoading, fetchAllStudents } = useChatContext();
-  const { classes, fetchClasses } = useStudentContext();
+  const { info, classes, fetchClasses } = useStudentContext();
   const { theme, regularFont, heavyFont } = useThemeContext();
   const [isCreateClassDialogOpen, setIsCreateClassDialogOpen] =
     useState<boolean>(false);
@@ -71,7 +71,7 @@ const Classes: FC<ClassesProps> = ({ handleEnterClassroom }) => {
     setIsSelectStudentAutocompleteOpen(true);
     try {
       // TODO: This needs to be switched to teachers
-      const fetchedStudents = await fetchAllStudents();
+      const fetchedStudents = await fetchAllStudents(info.student_id!);
       setAllStudents(fetchedStudents);
     } catch (error) {
       console.error("Error fetching teachers: ", error); // TODO: localize

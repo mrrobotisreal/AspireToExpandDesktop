@@ -3,7 +3,7 @@ import { useIntl } from "react-intl";
 import { Grid } from "@mui/material";
 
 import { useStudentContext } from "../../context/studentContext";
-import useChat, { EmitSendMessageParams } from "../../hooks/useChat";
+import useChat, { ChatUser, EmitSendMessageParams } from "../../hooks/useChat";
 import Layout from "../layout/layout";
 
 import ChatDialog from "./chatComponents/_chatDialog";
@@ -16,6 +16,9 @@ const Chat: FC = () => {
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const {
     isRegistering,
+    emitCreateChatRoom,
+    isCreatingChatRoom,
+    emitListChats,
     areChatsLoading,
     emitListMessages,
     areMessagesLoading,
@@ -28,12 +31,13 @@ const Chat: FC = () => {
   const [textMessage, setTextMessage] = useState<string>("");
   const [isStartNewChatOpen, setIsStartNewChatOpen] = useState<boolean>(false);
 
-  const handleChatSelect = (chatId: string) => {
+  const handleChatSelect = (chatId: string, chatName: string) => {
     localStorage.setItem("selectedChat", chatId);
     setSelectedChat(chatId);
     if (!info.student_id) {
       console.error("Teacher ID not found");
     }
+    setName(chatName);
     emitListMessages({ roomId: chatId, userId: info.student_id! });
   };
 
@@ -71,18 +75,27 @@ const Chat: FC = () => {
 
   const handleOpenStartNewChat = () => setIsStartNewChatOpen(true);
   const handleCloseStartNewChat = () => setIsStartNewChatOpen(false);
-  const handleStartNewChat = (name: string, toID: string) => {
-    setName(name);
+  const handleStartNewChat = (participants: ChatUser[], message: string) => {
+    emitCreateChatRoom({
+      sender: {
+        userId: info.student_id!,
+        userType: "teacher",
+        preferredName: info.preferred_name!,
+        firstName: info.first_name!,
+        lastName: info.last_name!,
+        profilePictureUrl: info.profile_picture_url || "",
+      },
+      participants,
+      message,
+      timestamp: Date.now(),
+    });
     handleCloseStartNewChat();
   };
 
   useEffect(() => {
     localStorage.removeItem("selectedChat");
+    localStorage.removeItem("createdChatRoomId");
     const storedStudentInfo = getInfo();
-    console.log(
-      "storedStudentInfo",
-      JSON.stringify(storedStudentInfo, null, 2)
-    );
 
     // TODO: Remove this useEffect in production;
     // This is just for testing purposes to keep info updated during refreshes
@@ -92,11 +105,43 @@ const Chat: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedChat && chatMessages.length > 0) {
+    const storedSelectedChat = localStorage.getItem("selectedChat");
+    const storedCreatedChatRoomId = localStorage.getItem("createdChatRoomId");
+    const storedCreatedChatRoomParticipants = localStorage.getItem(
+      "createdChatRoomParticipants"
+    );
+    if (storedCreatedChatRoomId && storedCreatedChatRoomParticipants) {
+      emitListChats({ userId: info.student_id! });
+      const chatParticipants = JSON.parse(storedCreatedChatRoomParticipants);
+      const chatName = chatParticipants
+        .filter(
+          (participant: ChatUser) => participant.userId !== info.student_id
+        )
+        .map((participant: ChatUser) => participant.preferredName)
+        .join(", ");
+      handleChatSelect(storedCreatedChatRoomId, chatName);
+      localStorage.removeItem("createdChatRoomId");
+      localStorage.removeItem("createdChatRoomParticipants");
+    }
+
+    if (
+      selectedChat &&
+      !storedSelectedChat &&
+      selectedChat === storedSelectedChat &&
+      chatMessages.length > 0
+    ) {
       emitReadMessages({
         chatId: selectedChat,
         unreadMessages: chatMessages,
       });
+    }
+
+    if (
+      storedSelectedChat &&
+      storedSelectedChat !== selectedChat &&
+      chatMessages
+    ) {
+      setSelectedChat(storedSelectedChat);
     }
   }, [chatMessages, selectedChat]);
 
@@ -116,9 +161,8 @@ const Chat: FC = () => {
           <ChatWindow
             selectedChat={selectedChat}
             messages={chatMessages}
-            messagesAreLoading={areMessagesLoading}
+            messagesAreLoading={areMessagesLoading || isCreatingChatRoom}
             name={name}
-            // toID={toID}
             textMessage={textMessage}
             handleTextMessageChange={handleTextMessageChange}
             handleClickAttach={handleClickAttach}

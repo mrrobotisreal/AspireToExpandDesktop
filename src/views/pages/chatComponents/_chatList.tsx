@@ -27,7 +27,7 @@ import Text from "../../text/text";
 interface ChatListProps {
   chats: ChatSummary[];
   chatsAreLoading: boolean;
-  onChatSelect: (chatId: string) => void;
+  onChatSelect: (chatId: string, chatName: string) => void;
   selectedChat: string | null;
   handleStartNewChat: () => void;
 }
@@ -121,38 +121,30 @@ const ChatList: FC<ChatListProps> = ({
         {!chatsAreLoading && (
           <List>
             {chats?.map((chat) => {
+              const chatName = chat.participants
+                .filter((participant) => participant.userId !== info.student_id)
+                .map((participant) => participant.preferredName)
+                .join(", ");
               return (
                 <Box key={chat.chatId}>
                   <ListItemButton
                     selected={selectedChat === chat.chatId}
-                    onClick={() => onChatSelect(chat.chatId)}
+                    onClick={() => onChatSelect(chat.chatId, chatName)}
                   >
                     <ListItemText
-                      primary={
-                        <Text
-                          fontFamily={regularFont}
-                          fontWeight="bold"
-                          textOverflow="ellipsis"
-                          noWrap
-                        >
-                          {chat.participants
-                            .filter(
-                              (participant) =>
-                                participant.userId !== info.student_id
-                            )
-                            .map((participant) => participant.preferredName)
-                            .join(", ")}
-                        </Text>
-                      }
-                      secondary={
-                        <Text
-                          fontFamily={regularFont}
-                          textOverflow="ellipsis"
-                          noWrap
-                        >
-                          {chat.latestMessage.content}
-                        </Text>
-                      }
+                      primaryTypographyProps={{
+                        fontFamily: regularFont,
+                        fontWeight: "bold",
+                        textOverflow: "ellipsis",
+                        noWrap: true,
+                      }}
+                      primary={chatName}
+                      secondaryTypographyProps={{
+                        fontFamily: regularFont,
+                        textOverflow: "ellipsis",
+                        noWrap: true,
+                      }}
+                      secondary={chat.latestMessage.content}
                     />
                   </ListItemButton>
                   <Stack direction="row">
@@ -164,13 +156,15 @@ const ChatList: FC<ChatListProps> = ({
                       {new Date(chat.latestMessage.timestamp).toLocaleString()}
                     </Text>
                     <Box sx={{ flexGrow: 1 }} />
-                    <Box sx={{ mr: 2 }}>
-                      {!info.student_id && !chat.latestMessage.isRead ? (
-                        <MarkChatUnreadTwoTone sx={{ color: "red" }} />
-                      ) : (
-                        <MarkChatReadTwoTone sx={{ color: "limegreen" }} />
-                      )}
-                    </Box>
+                    {chat.latestMessage.sender.userId !== info.student_id && (
+                      <Box sx={{ mr: 2 }}>
+                        {!chat.latestMessage.isRead ? (
+                          <MarkChatUnreadTwoTone sx={{ color: "red" }} />
+                        ) : (
+                          <MarkChatReadTwoTone sx={{ color: "limegreen" }} />
+                        )}
+                      </Box>
+                    )}
                   </Stack>
                   <Divider />
                 </Box>

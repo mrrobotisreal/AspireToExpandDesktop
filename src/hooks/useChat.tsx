@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
+import { v4 as uuidv4 } from "uuid";
 
 import { HTTP_CHAT_SERVER_URL, MAIN_SERVER_URL } from "../constants/urls";
 import { useStudentContext } from "../context/studentContext";
@@ -70,9 +71,18 @@ export interface EmitReadMessagesParams {
   unreadMessages: ChatMessage[];
 }
 
+export interface EmitCreateChatRoomParams {
+  sender: ChatUser;
+  participants: ChatUser[];
+  message: string;
+  timestamp: number;
+}
+
 interface UseChatReturns {
   emitRegisterUser: (params: EmitRegisterUserParams) => void;
   isRegistering: boolean;
+  emitCreateChatRoom: (params: EmitCreateChatRoomParams) => void;
+  isCreatingChatRoom: boolean;
   emitListChats: (params: EmitListChatsParams) => void;
   areChatsLoading: boolean;
   emitListMessages: (params: EmitListMessagesParams) => void;
@@ -89,6 +99,10 @@ const useChat = (): UseChatReturns => {
   const socketRef = useRef<Socket | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isCreatingChatRoom, setIsCreatingChatRoom] = useState(false);
+  const [createdChatRoomId, setCreatedChatRoomId] = useState<string | null>(
+    null
+  );
   const [chats, setChats] = useState<Chats>({});
   const [chatsList, setChatsList] = useState<Chat[]>([]);
   const [chatSummaries, setChatSummaries] = useState<ChatSummary[]>([]);
@@ -109,6 +123,60 @@ const useChat = (): UseChatReturns => {
   };
   const onRegisterUserError = (error: string) => {
     console.error("Error registering user:", error);
+  };
+
+  // Create Chat Room
+  const emitCreateChatRoom = (params: EmitCreateChatRoomParams) => {
+    setIsCreatingChatRoom(true);
+    socketRef.current?.emit("createChatRoom", {
+      newRoomId: uuidv4(),
+      ...params,
+    });
+  };
+  const onCreateChatRoomError = ({
+    errorMessage,
+    sender,
+    participants,
+    message,
+    timestamp,
+  }: {
+    errorMessage: string;
+    sender: ChatUser;
+    participants: ChatUser[];
+    message: string;
+    timestamp: number;
+  }) => {
+    if (errorMessage.includes("RoomId already exists")) {
+      console.log("Chat room already exists, trying again...");
+      emitCreateChatRoom({ sender, participants, message, timestamp });
+    } else {
+      console.error("Error creating chat room:", errorMessage);
+      setIsCreatingChatRoom(false);
+    }
+  };
+  const onChatRoomCreated = (incomingChatRoom: Chat) => {
+    console.log("Chat room created:", incomingChatRoom);
+    localStorage.setItem("createdChatRoomId", incomingChatRoom.chatId);
+    localStorage.setItem(
+      "createdChatRoomParticipants",
+      JSON.stringify(incomingChatRoom.participants)
+    );
+    localStorage.setItem("selectedChat", incomingChatRoom.chatId);
+    if (!chats[incomingChatRoom.chatId]) {
+      setChats({
+        ...chats,
+        [incomingChatRoom.chatId]: incomingChatRoom,
+      });
+    } else {
+      const newChats = {
+        ...chats,
+        [incomingChatRoom.chatId]: incomingChatRoom,
+      };
+      setChats(newChats);
+    }
+    setChatMessages(incomingChatRoom.messages);
+    setCreatedChatRoomId(incomingChatRoom.chatId);
+    setIsCreatingChatRoom(false);
   };
 
   // Chats List
@@ -223,6 +291,8 @@ const useChat = (): UseChatReturns => {
       const newSocket: Socket = io("http://localhost:11114");
       newSocket.on("userRegistered", onUserRegistered);
       newSocket.on("registerUserError", onRegisterUserError);
+      newSocket.on("chatRoomCreated", onChatRoomCreated);
+      newSocket.on("createChatRoomError", onCreateChatRoomError);
       newSocket.on("chatsList", onChatsList);
       newSocket.on("listChatsError", onListChatsError);
       newSocket.on("messagesList", onMessagesList);
@@ -266,6 +336,8 @@ const useChat = (): UseChatReturns => {
   return {
     emitRegisterUser,
     isRegistering,
+    emitCreateChatRoom,
+    isCreatingChatRoom,
     emitListChats,
     areChatsLoading,
     emitListMessages,

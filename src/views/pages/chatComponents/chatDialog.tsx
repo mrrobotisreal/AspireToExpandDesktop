@@ -39,7 +39,7 @@ const ChatDialog: FC<ChatDialogProps> = ({
   const handleOpenStartNewChatAutocomplete = async () => {
     setIsStartNewChatAutocompleteOpen(true);
     try {
-      const fetchedStudents = await fetchAllStudents();
+      const fetchedStudents = await fetchAllStudents("");
       setAllStudents(fetchedStudents);
     } catch (error) {
       console.error("Error fetching students: ", error); // TODO: localize

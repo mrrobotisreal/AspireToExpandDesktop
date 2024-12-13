@@ -54,7 +54,19 @@ export const createChatID = (
 export interface Student {
   student_id: string;
   preferred_name: string;
+  first_name: string;
+  last_name: string;
   email_address: string;
+  profile_picture_url: string;
+}
+
+export interface Teacher {
+  teacherID: string;
+  preferred_name: string;
+  first_name: string;
+  last_name: string;
+  email_address: string;
+  profile_picture_url: string;
 }
 
 interface ChatContextProps {
@@ -67,7 +79,10 @@ interface ChatContextProps {
   sendMessage: (message: ChatMessage) => void;
   students: Student[];
   studentsAreLoading: boolean;
-  fetchAllStudents: () => Promise<Student[]>;
+  fetchAllStudents: (studentId: string) => Promise<Student[]>;
+  teachers: Teacher[];
+  teachersAreLoading: boolean;
+  listTeachers: () => Promise<Teacher[]>;
 }
 
 const ChatContext = createContext<ChatContextProps>({
@@ -81,18 +96,23 @@ const ChatContext = createContext<ChatContextProps>({
   students: [],
   studentsAreLoading: false,
   fetchAllStudents: async () => [],
+  teachers: [],
+  teachersAreLoading: false,
+  listTeachers: async () => [],
 });
 
 export const useChatContext = () => useContext<ChatContextProps>(ChatContext);
 
 const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const { info } = useStudentContext();
+  // const { info } = useStudentContext();
   const [chats, setChats] = useState<Chat[]>([]);
   const [chatsAreLoading, setChatsAreLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [messagesAreLoading, setMessagesAreLoading] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
   const [studentsAreLoading, setStudentsAreLoading] = useState(false);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [teachersAreLoading, setTeachersAreLoading] = useState(false);
 
   const fetchChats = async (studentId: string) => {
     try {
@@ -183,7 +203,7 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  const fetchAllStudents = async () => {
+  const fetchAllStudents = async (studentId: string) => {
     try {
       setStudentsAreLoading(true);
       const response = await fetch(
@@ -196,7 +216,7 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
       localStorage.setItem("students", JSON.stringify(data.students));
 
       const filteredStudents = data.students.filter(
-        (student: Student) => student.preferred_name !== info.preferred_name
+        (student: Student) => student.student_id !== studentId
       );
       await sleep(1500); // TODO: remove this; for testing only right now
       setStudentsAreLoading(false);
@@ -205,6 +225,29 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
     } catch (error) {
       console.error("Error fetching students:", error);
       setStudentsAreLoading(false);
+    }
+  };
+
+  const listTeachers = async () => {
+    try {
+      setTeachersAreLoading(true);
+      const response = await fetch(
+        `${MAIN_SERVER_URL}/teachers?page=1&limit=100`
+      );
+      const data = await response.json();
+
+      console.log("Teachers:", JSON.stringify(data.teachers, null, 2));
+
+      // TODO: Implement pagination
+      setTeachers(data.teachers);
+
+      await sleep(1500); // TODO: remove this; for testing only right now
+      setTeachersAreLoading(false);
+
+      return data.teachers;
+    } catch (error) {
+      console.error("Error listing teachers:", error);
+      setTeachersAreLoading(false);
     }
   };
 
@@ -219,6 +262,9 @@ const ChatProvider: FC<{ children: ReactNode }> = ({ children }) => {
     students,
     studentsAreLoading,
     fetchAllStudents,
+    teachers,
+    teachersAreLoading,
+    listTeachers,
   };
 
   return <ChatContext.Provider value={values}>{children}</ChatContext.Provider>;
