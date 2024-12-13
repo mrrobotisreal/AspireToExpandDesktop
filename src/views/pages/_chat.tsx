@@ -13,6 +13,7 @@ import ChatWindow from "./chatComponents/_chatWindow";
 const Chat: FC = () => {
   const intl = useIntl();
   const { info, getInfo, updateInfo } = useStudentContext();
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const {
     isRegistering,
     areChatsLoading,
@@ -23,12 +24,12 @@ const Chat: FC = () => {
     chatSummaries,
     chatMessages,
   } = useChat();
-  const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [name, setName] = useState<string>("");
   const [textMessage, setTextMessage] = useState<string>("");
   const [isStartNewChatOpen, setIsStartNewChatOpen] = useState<boolean>(false);
 
   const handleChatSelect = (chatId: string) => {
+    localStorage.setItem("selectedChat", chatId);
     setSelectedChat(chatId);
     if (!info.student_id) {
       console.error("Teacher ID not found");
@@ -76,6 +77,7 @@ const Chat: FC = () => {
   };
 
   useEffect(() => {
+    localStorage.removeItem("selectedChat");
     const storedStudentInfo = getInfo();
     console.log(
       "storedStudentInfo",

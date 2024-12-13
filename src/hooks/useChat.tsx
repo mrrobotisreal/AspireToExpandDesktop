@@ -143,7 +143,6 @@ const useChat = (): UseChatReturns => {
     participants: ChatUser[];
     messagesList: ChatMessage[];
   }) => {
-    setChatMessages(messagesList);
     if (!chats[chatId]) {
       setChats({
         ...chats,
@@ -163,6 +162,10 @@ const useChat = (): UseChatReturns => {
         },
       };
       setChats(newChats);
+    }
+    const selectedChat = localStorage.getItem("selectedChat");
+    if (selectedChat && selectedChat === chatId) {
+      setChatMessages(messagesList);
     }
     setAreMessagesLoading(false);
   };
@@ -208,8 +211,11 @@ const useChat = (): UseChatReturns => {
       [incomingChat.chatId]: incomingChat,
     };
     setChats(updatedChats);
-    setChatMessages(incomingChat.messages); // this will be updated to only show the messages of the selected chat
     socketRef.current?.emit("receiveMessage", incomingChat.messages[0]);
+    const selectedChat = localStorage.getItem("selectedChat");
+    if (selectedChat && selectedChat === incomingChat.chatId) {
+      setChatMessages(incomingChat.messages);
+    }
   };
 
   useEffect(() => {
