@@ -30,6 +30,7 @@ const Chat: FC = () => {
     isCreatingChatRoom,
     emitListChats,
     areChatsLoading,
+    clearMessages,
     emitListMessages,
     areMessagesLoading,
     emitSendMessage,
@@ -64,6 +65,11 @@ const Chat: FC = () => {
     }
     setName(chatName);
     emitListMessages({ roomId: chatId, userId: info.student_id! });
+  };
+  const handleChatClose = () => {
+    clearMessages();
+    setSelectedChat(null);
+    setName("");
   };
 
   const handleTextMessageChange = (
@@ -485,6 +491,7 @@ const Chat: FC = () => {
         <Grid item xs={8} md={9}>
           <ChatWindow
             selectedChat={selectedChat}
+            handleCloseChat={handleChatClose}
             messages={chatMessages}
             messagesAreLoading={areMessagesLoading || isCreatingChatRoom}
             name={name}

@@ -94,6 +94,7 @@ interface UseChatReturns {
   isCreatingChatRoom: boolean;
   emitListChats: (params: EmitListChatsParams) => void;
   areChatsLoading: boolean;
+  clearMessages: () => void;
   emitListMessages: (params: EmitListMessagesParams) => void;
   areMessagesLoading: boolean;
   emitSendMessage: (params: EmitSendMessageParams) => void;
@@ -221,6 +222,9 @@ const useChat = (): UseChatReturns => {
   };
 
   // Messages List
+  const clearMessages = () => {
+    setChatMessages([]);
+  };
   const emitListMessages = (params: EmitListMessagesParams) => {
     setAreMessagesLoading(true);
     socketRef.current?.emit("listMessages", params);
@@ -363,6 +367,7 @@ const useChat = (): UseChatReturns => {
     isCreatingChatRoom,
     emitListChats,
     areChatsLoading,
+    clearMessages,
     emitListMessages,
     areMessagesLoading,
     emitSendMessage,
