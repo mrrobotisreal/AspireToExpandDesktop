@@ -223,7 +223,10 @@ const StudentInfoForm: FC = () => {
   return (
     <Layout title={intl.formatMessage({ id: "studentInfoForm_title" })}>
       <Text variant="h4" fontFamily={heavyFont} color="textPrimary">
-        {intl.formatMessage({ id: "common_welcome" }, { first_name })}
+        {intl.formatMessage(
+          { id: "common_welcome" },
+          { firstName: first_name }
+        )}
       </Text>
       <Text variant="body1" fontFamily={regularFont} color="textPrimary">
         {intl.formatMessage({ id: "studentInfoForm_description" })}

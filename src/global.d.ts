@@ -24,6 +24,7 @@ export interface ElectronAPI {
   loginWithGoogle: () => Promise<Credentials>;
   getStripePublishableKey: () => string;
   getPaymentServerURL: () => string;
+  getOpenAiApiKey: () => string;
 }
 
 declare global {

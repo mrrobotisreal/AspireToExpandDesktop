@@ -31,6 +31,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   loginWithGoogle: () => ipcRenderer.invoke("login-with-google"),
   getStripePublishableKey: () => process.env.STRIPE_PUBLISHABLE_KEY,
   getPaymentServerURL: () => process.env.PAYMENT_SERVER_URL,
+  getOpenAiApiKey: () => process.env.OPENAI_API_KEY,
 });
 
 window.addEventListener("DOMContentLoaded", () => {

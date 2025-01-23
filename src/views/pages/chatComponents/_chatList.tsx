@@ -20,14 +20,18 @@ import {
 
 import { useStudentContext } from "../../../context/studentContext";
 import { useThemeContext } from "../../../context/themeContext";
-import { ChatSummary } from "../../../hooks/useChat";
+import { ChatSummary, ChatUser } from "../../../hooks/useChat";
 import CircularLoading from "../../loading/circular";
 import Text from "../../text/text";
 
 interface ChatListProps {
   chats: ChatSummary[];
   chatsAreLoading: boolean;
-  onChatSelect: (chatId: string, chatName: string) => void;
+  onChatSelect: (
+    chatId: string,
+    chatName: string,
+    chatUsers: ChatUser[]
+  ) => void;
   selectedChat: string | null;
   handleStartNewChat: () => void;
 }
@@ -121,15 +125,19 @@ const ChatList: FC<ChatListProps> = ({
         {!chatsAreLoading && (
           <List>
             {chats?.map((chat) => {
-              const chatName = chat.participants
-                .filter((participant) => participant.userId !== info.student_id)
+              const chatUsers = chat.participants.filter(
+                (participant) => participant.userId !== info.student_id
+              );
+              const chatName = chatUsers
                 .map((participant) => participant.preferredName)
                 .join(", ");
               return (
                 <Box key={chat.chatId}>
                   <ListItemButton
                     selected={selectedChat === chat.chatId}
-                    onClick={() => onChatSelect(chat.chatId, chatName)}
+                    onClick={() =>
+                      onChatSelect(chat.chatId, chatName, chatUsers)
+                    }
                   >
                     <ListItemText
                       primaryTypographyProps={{
